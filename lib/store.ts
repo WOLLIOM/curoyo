@@ -45,6 +45,8 @@ interface State {
   mode: ModeChoice
   setMode: (m: ModeChoice) => void
   ready: boolean
+  struggling: boolean
+  setStruggling: (v: boolean) => void
   setReady: (v: boolean) => void
   gyroOn: boolean
   setGyroOn: (v: boolean) => void
@@ -70,6 +72,8 @@ export const useStore = create<State>((set) => ({
     set({ mode })
   },
   ready: false,
+  struggling: false,
+  setStruggling: (struggling) => set({ struggling }),
   setReady: (ready) => set({ ready }),
   gyroOn: false,
   setGyroOn: (gyroOn) => set({ gyroOn }),

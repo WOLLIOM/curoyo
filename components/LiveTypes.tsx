@@ -13,6 +13,7 @@ export default function LiveTypes() {
   // Headlines wake up a couple of seconds after the intro, never during it.
   const ready = useStore((s) => s.ready)
   const [armed, setArmed] = useState(false)
+  const struggling = useStore((s) => s.struggling)
   useEffect(() => {
     if (!ready) return
     const t = window.setTimeout(() => setArmed(true), 2500)
@@ -95,7 +96,7 @@ export default function LiveTypes() {
   return (
     <>
       {els
-        .filter((el) => armed && !lite() && mounted.has(el))
+        .filter((el) => armed && !struggling && !lite() && mounted.has(el))
         .map((el, i) => (
           <LiveMark key={el.dataset.live || i} anchor={el} size={size} load={buildTextData} hideAnchor />
         ))}

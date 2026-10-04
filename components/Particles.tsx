@@ -391,7 +391,8 @@ export default function Particles() {
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
   const level = useMemo(() => tier(), [])
   const weak = level === 'low'
-  const S = lite() ? 80 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
+  const struggling = useStore((s) => s.struggling)
+  const S = lite() ? 80 : struggling ? 96 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
