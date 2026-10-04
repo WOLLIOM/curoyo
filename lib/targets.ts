@@ -776,8 +776,11 @@ export const CRADLE_PIVOT_Y = 0.459 * MODEL_SCALE.cradle
 
 async function loadModel(name: string, count: number) {
   const res = await fetch(`/models/${name}.bin`)
-  const a = new Int16Array(await res.arrayBuffer())
+  if (!res.ok) throw new Error(`model ${name} ${res.status}`)
+  const buf = await res.arrayBuffer()
+  const a = new Int16Array(buf, 0, Math.floor(buf.byteLength / 16) * 8)
   let total = a.length / 8
+  if (total < 1) throw new Error(`model ${name} empty`)
   const sc = MODEL_SCALE[name]
   // The baked tree model is a row of three trees; keep only the middle one and scale it up to fill the room.
   let keep: number[] | null = null

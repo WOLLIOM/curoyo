@@ -55,6 +55,8 @@ export default function Scene() {
   const [maxDpr, setMaxDpr] = useState(2)
   const [dpr, setDpr] = useState(1.5)
   const [slow, setSlow] = useState(false)
+  // If the browser drops the GPU context (heavy load, tab switch), every shape texture is lost: rebuild the whole scene.
+  const [epoch, setEpoch] = useState(0)
   useEffect(() => {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
@@ -111,6 +113,12 @@ export default function Scene() {
   return (
     <div className="fixed inset-0 z-0">
       <Canvas
+        key={epoch}
+        onCreated={({ gl }) => {
+          const c = gl.domElement
+          c.addEventListener('webglcontextlost', (e) => e.preventDefault())
+          c.addEventListener('webglcontextrestored', () => setEpoch((n) => n + 1))
+        }}
         dpr={dpr}
         frameloop={step || slow ? 'never' : 'always'}
         gl={{ antialias: false, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: step }}

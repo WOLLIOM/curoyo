@@ -391,8 +391,7 @@ export default function Particles() {
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
   const level = useMemo(() => tier(), [])
   const weak = level === 'low'
-  const struggling = useStore((s) => s.struggling)
-  const S = lite() ? 80 : struggling ? 96 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
+  const S = lite() ? 80 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
@@ -547,16 +546,26 @@ export default function Particles() {
 
       // Everything the visitor will meet later loads quietly in the background, nearest first.
       if (!built.gpu) return
-      const fill = (name: FormationName, t: THREE.DataTexture, n?: THREE.DataTexture) =>
-        buildFormation(name, S).then((f) => {
-          if (cancelled) return
-          ;(t.image.data as unknown as Float32Array).set(f.pos)
-          t.needsUpdate = true
-          if (n && f.nrm) {
-            ;(n.image.data as unknown as Float32Array).set(f.nrm)
-            n.needsUpdate = true
-          }
-        })
+      // A failed or empty build (a model that did not load, a stalled worker) is retried, so a shape can never stay blank.
+      const fill = (name: FormationName, t: THREE.DataTexture, n?: THREE.DataTexture, tries = 0): Promise<void> =>
+        buildFormation(name, S)
+          .then((f) => {
+            if (cancelled) return
+            if (!f || !f.pos || f.pos.length === 0) throw new Error('empty formation')
+            ;(t.image.data as unknown as Float32Array).set(f.pos)
+            t.needsUpdate = true
+            if (n && f.nrm) {
+              ;(n.image.data as unknown as Float32Array).set(f.nrm)
+              n.needsUpdate = true
+            }
+          })
+          .catch((err) => {
+            if (cancelled || tries >= 4) {
+              console.warn('CUROYO: formation failed', name, err)
+              return
+            }
+            timers.push(window.setTimeout(() => void fill(name, t, n, tries + 1), 1500 * (tries + 1)))
+          })
       const jobs: [FormationName, THREE.DataTexture, THREE.DataTexture?][] = [
         ['tree', tex.tree, tex.nTree],
         ['cradle', tex.cradle, tex.nCradle],
@@ -590,9 +599,12 @@ export default function Particles() {
       const start = () => {
         list.forEach(([name, t, n], i) => {
           // A build never starts while you are scrolling or moving: it waits until the page has been still for a moment.
+          let queued = 0
           const run = () => {
             if (cancelled) return
-            if (performance.now() - lastMove < 700) {
+            if (!queued) queued = performance.now()
+            // ...but never for long: every shape must exist before you reach it.
+            if (performance.now() - lastMove < 700 && performance.now() - queued < 2500) {
               timers.push(window.setTimeout(run, 350))
               return
             }
