@@ -755,7 +755,7 @@ export default function Particles() {
     if (Math.abs(s - st.lastS) > 0.0004) st.idle = 0
     else st.idle += dt
     st.lastS = s
-    st.settle += ((st.idle > 0.25 ? 1 : 0) - st.settle) * (1 - Math.exp(-dt * 2.5))
+    st.settle += ((st.idle > 0.12 ? 1 : 0) - st.settle) * (1 - Math.exp(-dt * 5))
     const tRaw = smooth(0.05, 0.2, s - i)
     const t = tRaw + (Math.round(tRaw) - tRaw) * st.settle
     const A = i === PRICING_ROOM ? { ...rooms[i], target: PLAN_TARGET[live.plan] } : rooms[i]
@@ -894,7 +894,7 @@ export default function Particles() {
     const wireTarget = Math.min(3, Math.max(0, (s - 4.6) * 1.5))
     st.wire += (wireTarget - st.wire) * (1 - Math.exp(-dt * 7))
     vu.uWire.value = st.wire
-    ;(vu.uGrav.value as THREE.Vector2).set(reduced ? 0 : tiltX, reduced ? 0 : -tiltY)
+    ;(vu.uGrav.value as THREE.Vector2).set(reduced ? 0 : tiltX * (vu.uStiff.value / 95), reduced ? 0 : -tiltY * (vu.uStiff.value / 95))
     ;(vu.uMouse.value as THREE.Vector2).set(local.x, local.y)
     ;(vu.uMouseVel.value as THREE.Vector2).copy(mouseVel)
 
