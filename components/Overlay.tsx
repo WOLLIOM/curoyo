@@ -210,7 +210,7 @@ function ThemePicker() {
             <span key={i} className="h-3 w-3 rounded-full" style={{ background: c, boxShadow: '0 0 0 1.5px var(--bg)' }} />
           ))}
         </span>
-        {current.name}
+        <span className="max-sm:hidden">{current.name}</span>
       </button>
       {open && (
         <ul
@@ -294,7 +294,8 @@ function SoundControl() {
             <span key={i} className={`w-[3px] rounded-full ${soundOn ? 'eq' : ''}`} style={{ height: `${soundOn ? h * 100 : 30}%`, background: 'var(--ink)', animationDelay: `${i * 0.18}s` }} />
           ))}
         </span>
-        {soundOn ? TRACKS[track].title : 'Sound off'}
+        <span className="max-sm:hidden">{soundOn ? TRACKS[track].title : 'Sound off'}</span>
+        <span className="sm:hidden">{soundOn ? 'Sound on' : 'Sound off'}</span>
       </button>
       {soundOn && (
         <button
@@ -304,7 +305,7 @@ function SoundControl() {
             sound.play(n)
           }}
           aria-label="Next song"
-          className="opacity-60 transition-opacity hover:opacity-100"
+          className="opacity-60 transition-opacity hover:opacity-100 max-sm:hidden"
         >
           Next sound ›
         </button>
@@ -482,7 +483,7 @@ export default function Overlay() {
         <SoundControl />
         <div className="pointer-events-auto flex items-center gap-5 sm:gap-6">
           <Gyro />
-          <button onClick={() => setGame(true)} data-hover="Play" className="text-[14px] font-bold opacity-80 transition-opacity hover:opacity-100">
+          <button onClick={() => setGame(true)} data-hover="Play" className="max-sm:hidden text-[14px] font-bold opacity-80 transition-opacity hover:opacity-100">
             Play
           </button>
           <ThemePicker />
@@ -492,7 +493,7 @@ export default function Overlay() {
       <main>
         {/* INTRO: the wordmark is a live material; the snake does the moving. */}
         <section data-section id="intro" className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[15vh] max-sm:pb-40">
-          <h1 className="sr-only">CUROYO. Ideas, built in 3D.</h1>
+          <h1 className="sr-only">CUROYO, by Simon Maxam. Ideas, built in 3D.</h1>
           {/* The image holds the wordmark's place; once the live particle wordmark is running it draws over this spot. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -510,7 +511,7 @@ export default function Overlay() {
             onPointerCancel={() => window.clearTimeout(pressTimer.current)}
           />
           <p className="mt-6 text-[17px] font-semibold" style={{ color: 'var(--muted)', opacity: 'var(--intro)' }}>
-            Ideas, built in 3D
+            by Simon Maxam
           </p>
         </section>
 
