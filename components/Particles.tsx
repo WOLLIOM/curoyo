@@ -381,6 +381,7 @@ interface Engine {
   pos: Variable | null
   vel: Variable | null
   textures: THREE.DataTexture[]
+  since?: number
 }
 
 export default function Particles() {
@@ -540,7 +541,7 @@ export default function Particles() {
         built = { gpu, pos, vel, textures }
       }
       engine.current = built
-      useStore.getState().setReady(true)
+      built.since = performance.now()
 
       // Everything the visitor will meet later loads quietly in the background, nearest first.
       if (!built.gpu) return
@@ -651,7 +652,14 @@ export default function Particles() {
     const steps = Math.min(weak ? 2 : 3, Math.max(1, Math.ceil(delta / (1 / 30))))
     const sdt = Math.min(delta / steps, 1 / 30)
     const dt = Math.min(delta, 1 / 30)
-    st.sim += sdt * steps
+    // Hold the intro until the wordmark is built too (or 3.5 s have passed), then start both on the same frame.
+    if (!live.go) {
+      const waited = performance.now() - (e.since ?? performance.now())
+      if (reduced || (live.wm && waited > 400) || waited > 3500) {
+        live.go = true
+        useStore.getState().setReady(true)
+      }
+    } else st.sim += sdt * steps
 
     // The intro runs on simulation time so the wordmark never arrives before the snake has formed.
     const introT = reduced ? 9 : st.sim / 2.2

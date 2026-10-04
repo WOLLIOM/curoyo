@@ -279,6 +279,7 @@ export default function LiveMark({ anchor, size: S, load, start = 0, onReady, hi
     const g = groupRef.current
     const e = engine.current
     if (!g || !e) return
+    if (start > 0 && !live.go) return
     const s = st.current
 
     // Sit exactly where the element sits in the page, so it scrolls and resizes with the layout.

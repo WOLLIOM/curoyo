@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { buildWordmarkData } from '@/lib/targets'
-import { useStore } from '@/lib/store'
+import { live, useStore } from '@/lib/store'
 import LiveMark from './LiveMark'
 import { tier } from '@/lib/perf'
 
@@ -26,7 +26,10 @@ export default function Wordmark3D() {
   }, [])
 
   const load = useCallback((_: HTMLElement, s: number) => buildWordmarkData(s), [])
-  const onReady = useCallback((ok: boolean) => useStore.getState().setLiveWordmark(ok), [])
+  const onReady = useCallback((ok: boolean) => {
+    live.wm = true
+    useStore.getState().setLiveWordmark(ok)
+  }, [])
 
   return el ? <LiveMark anchor={el} size={size} load={load} start={1} onReady={onReady} /> : null
 }

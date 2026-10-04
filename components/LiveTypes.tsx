@@ -4,11 +4,20 @@ import { useEffect, useMemo, useState } from 'react'
 import { buildTextData } from '@/lib/livetype'
 import LiveMark from './LiveMark'
 import { tier } from '@/lib/perf'
+import { useStore } from '@/lib/store'
 
 // Headlines marked with data-live become live type when they come near the screen,
 // and dissolve back to plain text (and free their GPU memory) when they're far away.
 export default function LiveTypes() {
   const [els, setEls] = useState<HTMLElement[]>([])
+  // Headlines wake up a couple of seconds after the intro, never during it.
+  const ready = useStore((s) => s.ready)
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    if (!ready) return
+    const t = window.setTimeout(() => setArmed(true), 2500)
+    return () => window.clearTimeout(t)
+  }, [ready])
   const [active, setActive] = useState<Set<HTMLElement>>(new Set())
   const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 88 : tier() === 'low' ? 112 : 144), [])
 
@@ -57,7 +66,7 @@ export default function LiveTypes() {
   return (
     <>
       {els
-        .filter((el) => active.has(el))
+        .filter((el) => armed && active.has(el))
         .map((el, i) => (
           <LiveMark key={el.dataset.live || i} anchor={el} size={size} load={buildTextData} hideAnchor />
         ))}

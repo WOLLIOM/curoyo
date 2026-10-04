@@ -100,6 +100,9 @@ export const live = {
   shake: 0,
   plan: 1,
   blow: 0,
+  // Start-up gate: the intro only begins once the snake and the wordmark are both built (wm), so it never runs through a hitch.
+  wm: false,
+  go: false,
   // The blended theme on screen right now; every visual reads from this.
   theme: { ...THEMES.void } as Theme,
 }
