@@ -202,7 +202,7 @@ void main() {
   // Cursor: a pressure field that parts the matter, plus drag, like a hand through water.
   vec2 d = p.xy - uMouse;
   float dist = length(d);
-  float f = smoothstep(1.35, 0.0, dist) * uMouseStrength;
+  float f = smoothstep(1.35, 0.0, dist) * uMouseStrength * (1.0 - 0.92 * uW2.w);
   acc.xy += normalize(d + 1e-5) * f * 26.0;
   acc.xy += uMouseVel * f * 5.0;
   acc.z += f * 7.0 * (rnd.w - 0.25);
