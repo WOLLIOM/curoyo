@@ -236,7 +236,7 @@ export default function PizzaShowcase() {
       ([e]) => {
         if (!e.isIntersecting) return
         near.disconnect()
-        loadCloud(phone ? 22000 : tier() === 'low' ? 34000 : 60000)
+        loadCloud(phone ? 22000 : tier() === 'low' ? 30000 : 42000)
           .then((c) => {
             if (dead) return
             cloud = c

@@ -347,7 +347,7 @@ const ROOMS_DESKTOP: Room[] = [
   { x: 0, y: 0.25, s: 0.85, rz: 0, dim: 0.42, target: 1 },
   { x: 0, y: 0.45, s: 0.9, rz: 0, dim: 0.9, target: 5 },
   { x: 3.3, y: 0.2, s: 0.85, rz: 0, dim: 1, target: 8 },
-  { x: 0, y: 0, s: 1.05, rz: 0, dim: 0.07, target: 5 },
+  { x: 3.3, y: 0.2, s: 0.95, rz: 0, dim: 0.45, target: 8 },
   { x: 3.5, y: 0.1, s: 0.8, rz: 0, dim: 1, target: 6 },
   { x: 0, y: 0.8, s: 1.1, rz: 0, dim: 1, target: 7 },
   { x: 0, y: 0.4, s: 1.15, rz: 0, dim: 0.08, target: 4 },
@@ -363,7 +363,7 @@ const ROOMS_STACKED: Room[] = [
   { x: 0, y: 1.2, s: 0.72, rz: 0, dim: 0.4, target: 1 },
   { x: 0, y: 1.2, s: 1.15, rz: 0, dim: 0.5, target: 5 },
   { x: 0, y: 1.9, s: 0.9, rz: 0, dim: 0.75, target: 8 },
-  { x: 0, y: 1.2, s: 1.1, rz: 0, dim: 0.14, target: 5 },
+  { x: 0, y: 1.9, s: 1.0, rz: 0, dim: 0.4, target: 8 },
   { x: 0, y: 1.5, s: 1.0, rz: 0, dim: 0.85, target: 6 },
   { x: 0, y: 2.1, s: 1.3, rz: 0, dim: 1, target: 7 },
   { x: 0, y: 1.5, s: 1.1, rz: 0, dim: 0.14, target: 4 },
@@ -398,7 +398,8 @@ export default function Particles() {
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
   const level = useMemo(() => tier(), [])
   const weak = level === 'low'
-  const S = lite() ? 80 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
+  // Computers get the phone's recipe with a little more: enough grains for a big screen, not four times the work.
+  const S = lite() ? 80 : mobile ? 96 : weak ? 112 : level === 'mid' ? 128 : 144
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
@@ -737,7 +738,7 @@ export default function Particles() {
       if (!Number.isFinite(st[key])) st[key] = key === 'lastIntroVar' ? -1 : key === 'sim' ? 9 : 0
     }
     // Fixed-size physics steps; when frames drop, take a few catch-up steps so motion stays physical.
-    const steps = Math.min(weak ? 2 : 3, Math.max(1, Math.ceil(delta / (1 / 30))))
+    const steps = Math.min(2, Math.max(1, Math.ceil(delta / (1 / 30))))
     const sdt = Math.min(delta / steps, 1 / 30)
     const dt = Math.min(delta, 1 / 30)
     // Hold the intro until the wordmark is built too (or 3.5 s have passed), then start both on the same frame.
@@ -878,7 +879,7 @@ export default function Particles() {
     ;(ru.uColorB.value as THREE.Color).lerp(colB, 1 - Math.exp(-dt * 2))
     ;(ru.uShadow.value as THREE.Color).lerp(colS, 1 - Math.exp(-dt * 2))
     ru.uAccentAmt.value += (m.accentAmt - ru.uAccentAmt.value) * (1 - Math.exp(-dt * 2))
-    const grain = mobile ? 0.05 : weak ? 0.04 : 0.033
+    const grain = mobile ? 0.05 : weak ? 0.042 : 0.038
     ru.uSize.value = (grain * size.height * gl.getPixelRatio()) / 2 / Math.tan((50 * Math.PI) / 360)
 
     ru.uTime.value = time

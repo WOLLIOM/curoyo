@@ -143,7 +143,7 @@ export default function ProductDemo() {
         onPointerCancel={() => (drag.current.down = false)}
       >
         {visible && (
-          <Canvas dpr={[1, 2]} camera={{ position: [0, 0.2, 4.6], fov: 35 }} gl={{ antialias: true, alpha: true }}>
+          <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0.2, 4.6], fov: 35 }} gl={{ antialias: true, alpha: true }}>
             <Studio />
             <ambientLight intensity={0.25} />
             <directionalLight position={[3, 4, 3]} intensity={1.6} />

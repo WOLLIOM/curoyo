@@ -47,15 +47,18 @@ function Beat({ restart }: { restart: () => void }) {
   return null
 }
 
-function Throttle() {
+// Drives the scene at most 60 fps (30 in light mode). A 120/144 Hz monitor would otherwise draw the whole world two
+// or three times as often as a phone does, for no visible gain: that is why computers felt heavier than phones.
+function Throttle({ slow }: { slow: boolean }) {
   const advance = useThree((s) => s.advance)
   const get = useThree((s) => s.get)
   useEffect(() => {
     let raf = 0
     let last = 0
+    const gap = slow ? 31 : 12
     const loop = (t: number) => {
       raf = requestAnimationFrame(loop)
-      if (document.hidden || t - last < 31) return
+      if (document.hidden || t - last < gap) return
       // Step the scene's own clock forward. (Passing the rAF timestamp mixed two clocks: on some browsers it gave
       // one huge negative frame that turned the whole particle sim into NaN, freezing or blanking every shape.)
       const step = last ? Math.min(0.1, Math.max(0.001, (t - last) / 1000)) : 1 / 30
@@ -64,7 +67,7 @@ function Throttle() {
     }
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
-  }, [advance, get])
+  }, [advance, get, slow])
   return null
 }
 
@@ -101,10 +104,10 @@ export default function Scene() {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
     const weak = tier() === 'low'
-    const top = Math.min(window.devicePixelRatio || 1, lite() ? 1 : phone ? 2 : weak ? 1.25 : 1.75)
+    const top = Math.min(window.devicePixelRatio || 1, lite() ? 1 : phone ? 2 : weak ? 1.25 : 1.5)
     setMaxDpr(top)
-    // Start a notch below the ceiling; the monitor climbs back up if the device has room to spare.
-    setDpr(Math.min(top, phone || weak ? 1 : 1.5))
+    // Start low like a phone does; the monitor climbs back up if the device has room to spare.
+    setDpr(Math.min(top, 1))
     setMounted(true)
   }, [])
   // Watchdog: if the real frame rate stays low (an old or busy computer), switch to the light mode for good:
@@ -185,13 +188,14 @@ export default function Scene() {
       <Canvas
         key={epoch}
         dpr={dpr}
-        frameloop={step || slow ? 'never' : 'always'}
+        frameloop="never"
         gl={{ antialias: false, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: step }}
         camera={{ position: [0, 0, 8], fov: 50, near: 0.1, far: 60 }}
       >
         {!step && (
           <PerformanceMonitor
             flipflops={4}
+            bounds={() => [42, 56]}
             onDecline={() => {
               if (dpr <= 0.9) {
                 setSlow(true)
@@ -212,7 +216,7 @@ export default function Scene() {
         <Wordmark3D />
         <LiveTypes />
         {step && <Stepper />}
-        {slow && !step && <Throttle />}
+        {!step && <Throttle slow={slow} />}
       </Canvas>
     </div>
   )
