@@ -408,7 +408,7 @@ export default function Overlay() {
         if (el.offsetTop <= top + 1) j = k
       })
       const nxt = els[j + 1]
-      live.section = j + (nxt ? Math.min(1, Math.max(0, (top - els[j].offsetTop) / (nxt.offsetTop - els[j].offsetTop))) : 0)
+      live.section = j + (nxt ? Math.min(1, Math.max(0, (top - els[j].offsetTop) / Math.max(1, nxt.offsetTop - els[j].offsetTop))) : 0)
       if (activeRef.current !== i) {
         activeRef.current = i
         setActive(i)
@@ -543,7 +543,7 @@ export default function Overlay() {
           <p data-react data-live="idea" className="font-display text-[clamp(110px,24vw,380px)] leading-[0.82] tracking-[-0.03em]">Build<br />it.</p>
         </section>
         {/* THE DARK ROOM: the page goes dark and only what the cursor lights can be read. */}
-        <section data-section id="form" className="relative flex min-h-[150svh] flex-col justify-center gap-[10svh] px-6 py-[14svh] sm:px-10" style={{ background: 'linear-gradient(to bottom, transparent, rgba(2,4,10,0.82) 16%, rgba(2,4,10,0.82) 84%, transparent)' }}>
+        <section data-section id="form" className="relative flex max-sm:h-0 max-sm:min-h-0 max-sm:overflow-hidden max-sm:p-0 max-sm:invisible min-h-[150svh] flex-col justify-center gap-[10svh] px-6 py-[14svh] sm:px-10" style={{ background: 'linear-gradient(to bottom, transparent, rgba(2,4,10,0.82) 16%, rgba(2,4,10,0.82) 84%, transparent)' }}>
           <p className="pointer-events-none mx-auto text-[13px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--muted)' }}>It is dark in here. Bring light.</p>
           <Torch radius={230} dim={0.06} lit="var(--ink)" className="mx-auto w-full max-w-[1000px] text-center text-[clamp(30px,5.6vw,80px)] leading-[1.05] tracking-[-0.01em]" text="We make things you can walk into, hold, and play." />
           <div className="mx-auto grid w-full max-w-[1100px] gap-x-14 gap-y-[8svh] sm:grid-cols-2">
