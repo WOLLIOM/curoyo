@@ -572,11 +572,22 @@ export default function Particles() {
       const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
       // The pavilion is the heaviest object: phones keep the light ring there instead of building it.
       const list = weak ? jobs.filter(([name]) => name !== 'spaces') : jobs
-      list.forEach(([name, t, n], i) => {
-        const run = () => void fill(name, t, n)
-        const delay = weak ? 3500 + i * 1100 : 700 + i * 350
-        timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 2500 }) : run()), delay))
-      })
+      // Nothing starts until the intro has finished and the logo has held for a moment: building these during
+      // the snake-to-logo morph is what made the hero hitch.
+      const start = () => {
+        list.forEach(([name, t, n], i) => {
+          const run = () => void fill(name, t, n)
+          const delay = weak ? 2500 + i * 1100 : 1500 + i * 600
+          timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 4000 }) : run()), delay))
+        })
+      }
+      const wait = window.setInterval(() => {
+        if (live.go || cancelled) {
+          window.clearInterval(wait)
+          if (!cancelled) timers.push(window.setTimeout(start, 2500))
+        }
+      }, 250)
+      timers.push(wait)
     })
     return () => {
       cancelled = true
