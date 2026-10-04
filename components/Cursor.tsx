@@ -74,6 +74,7 @@ export default function Cursor() {
     const cane_pts: { t: number; o: number; s: number; n: boolean }[] = []
     for (let i = 0; i < 110; i++) cane_pts.push({ t: i / 110, o: rnd(6), s: 1.5 + Math.random() * 0.9, n: false })
     for (let k2 = 1; k2 * 15 < 46; k2++) for (let j = 0; j < 7; j++) cane_pts.push({ t: (k2 * 15) / 46, o: -4 + j * 1.35, s: 1.9, n: true })
+    const BITE = 0.85
     let cool = 2
     let inSection = false
     const darkEl = document.getElementById('form')
@@ -121,6 +122,10 @@ export default function Cursor() {
         glow += ((dark ? 1 : 0) - glow) * Math.min(1, dt * 3)
         const P = panda
         const hot = col
+        const live = P.st !== 'away' || inSection
+        const caneCol = live ? '#b8ff2a' : hot
+        const caneInk = live ? '#b8ff2a' : inkCol
+        const pandaCol = '#ff4d1f'
         if (P.st === 'away') {
           if (inSection && cool <= 0 && pandaPts.length) {
             // Grains drift in from all around and gather into the logo beside the cane.
@@ -152,7 +157,7 @@ export default function Cursor() {
           P.x += (x - 78 * P.dir - P.x) * 0.2
           P.y += (y - 18 - P.y) * 0.2
           P.t += dt
-          if (P.t > 0.45) {
+          if (P.t > BITE) {
             P.t = 0
             P.bites++
             cane = Math.max(0, 1 - P.bites / 3)
@@ -166,7 +171,7 @@ export default function Cursor() {
           P.x += (x - 78 * P.dir - P.x) * 0.2
           P.y += (y - 18 - P.y) * 0.2
           P.t += dt
-          if (P.t > 1.1) {
+          if (P.t > 2.4) {
             // Done eating: the grains stay and start morphing with the page, like the site's own particles.
             P.st = 'drift'
             P.t = 0
@@ -231,9 +236,25 @@ export default function Cursor() {
           const L = 46 * q.t * k
           const lx = q.o + Math.sin(frame * 0.12 + i) * 0.7
           const ly = -L + Math.cos(frame * 0.1 + i * 2) * 0.7
-          grain(x + lx * ca - ly * sa, y + lx * sa + ly * ca, q.s, q.n ? hot : ink, q.n ? 0.95 : 0.8)
+          grain(x + lx * ca - ly * sa, y + lx * sa + ly * ca, q.s, q.n ? caneCol : caneInk, q.n ? 1 : 0.9)
         }
-        grain(x, y, 4 * k, hot)
+        grain(x, y, 4 * k, caneCol)
+
+        // Warning above the cane while the panda is about to eat it.
+        if (P.st === 'chase' || P.st === 'eat') {
+          ctx.globalAlpha = 1
+          ctx.font = '800 15px ui-monospace, Menlo, Consolas, monospace'
+          ctx.textAlign = 'center'
+          const wob = P.st === 'eat' ? Math.sin(frame * 1.4) * 2 : 0
+          const msg = 'WATCH OUT, IT EATS!'
+          const wy = Math.max(24, y - 74)
+          const wx = Math.min(innerWidth - 110, Math.max(110, x + wob))
+          ctx.lineWidth = 4
+          ctx.strokeStyle = '#000'
+          ctx.strokeText(msg, wx, wy)
+          ctx.fillStyle = '#b8ff2a'
+          ctx.fillText(msg, wx, wy)
+        }
 
         // Crumbs: grains that fly off with each bite.
         for (let i = crumbs.length - 1; i >= 0; i--) {
@@ -246,7 +267,7 @@ export default function Cursor() {
             crumbs.splice(i, 1)
             continue
           }
-          grain(c2.x, c2.y, 2.4, ink, c2.life)
+          grain(c2.x, c2.y, 3, '#b8ff2a', c2.life)
         }
         ctx.globalAlpha = 1
 
@@ -254,7 +275,7 @@ export default function Cursor() {
           // The logo as grains: they gather from all around, hold the shape beside the cane, then scatter again.
           const forming = P.st === 'chase'
           const leaving = P.st === 'leave'
-          const lunge = P.st === 'eat' ? Math.max(0, Math.sin((P.t / 0.45) * Math.PI)) * 7 : 0
+          const lunge = P.st === 'eat' ? Math.max(0, Math.sin((P.t / BITE) * Math.PI)) * 7 : 0
           const squash = P.st === 'chew' ? 1 - Math.abs(Math.sin(P.t * 9)) * 0.06 : 1
           const fade = leaving ? Math.max(0, 1 - P.t / 0.9) : 1
           for (let i = 0; i < pandaPts.length; i++) {
@@ -340,7 +361,7 @@ export default function Cursor() {
               q.y += (ty2 - q.y) * rate
             }
             const al = forming ? Math.min(1, 0.25 + P.t * 0.8) : fade
-            grain(q.x + Math.sin(frame * 0.2 + i) * 0.4, q.y + Math.cos(frame * 0.17 + i) * 0.4, q.s, q.c === 0 ? hot : ink, 0.95 * al)
+            grain(q.x + Math.sin(frame * 0.2 + i) * 0.4, q.y + Math.cos(frame * 0.17 + i) * 0.4, q.s, q.c === 0 ? '#ffffff' : pandaCol, 0.95 * al)
           }
           ctx.globalAlpha = 1
         }

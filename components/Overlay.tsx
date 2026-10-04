@@ -632,7 +632,7 @@ export default function Overlay() {
               It climbs where others will not and looks at the world from above. We build the same way: patient, playful, and a little out of reach.
             </p>
             <p className="mt-5 text-[14px] font-bold" style={{ color: 'var(--muted)' }}>
-              Its bamboo grows here, cane by cane. Stir it with your cursor, or tilt your phone.
+              Its bamboo grows here, cane by cane. Stir it with your cursor, or tilt your phone. Watch out: the panda eats the cane.
             </p>
           </div>
         </section>
