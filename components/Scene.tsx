@@ -37,10 +37,10 @@ export default function Scene() {
   useEffect(() => {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
-    const top = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 1.75)
+    const top = Math.min(window.devicePixelRatio || 1, phone ? 2 : 1.75)
     setMaxDpr(top)
     // Start a notch below the ceiling; the monitor climbs back up if the device has room to spare.
-    setDpr(Math.min(top, phone ? 1.25 : 1.5))
+    setDpr(Math.min(top, phone ? 2 : 1.5))
     setMounted(true)
   }, [])
   if (!mounted) return null
@@ -56,9 +56,9 @@ export default function Scene() {
         {!step && (
           <PerformanceMonitor
             flipflops={4}
-            onDecline={() => setDpr((d) => Math.max(0.75, +(d - 0.4).toFixed(2)))}
+            onDecline={() => setDpr((d) => Math.max(1, +(d - 0.25).toFixed(2)))}
             onIncline={() => setDpr((d) => Math.min(maxDpr, +(d + 0.25).toFixed(2)))}
-            onFallback={() => setDpr(0.75)}
+            onFallback={() => setDpr(1)}
           />
         )}
         <SpotField />

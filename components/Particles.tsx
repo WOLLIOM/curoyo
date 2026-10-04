@@ -563,8 +563,13 @@ export default function Particles() {
         ['portrait', tex.portrait],
         ['cloud', tex.cloud, tex.nCloud],
       ]
+      // Each build is a burst of main-thread work, so they run one at a time, only when the browser is idle,
+      // and (on phones) well after the hero has settled, so the intro and first scroll stay smooth.
+      const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
       jobs.forEach(([name, t, n], i) => {
-        timers.push(window.setTimeout(() => void fill(name, t, n), 700 + i * 350))
+        const run = () => void fill(name, t, n)
+        const delay = mobile ? 3500 + i * 1100 : 700 + i * 350
+        timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 2500 }) : run()), delay))
       })
     })
     return () => {
@@ -752,7 +757,7 @@ export default function Particles() {
     ;(ru.uColorB.value as THREE.Color).lerp(colB, 1 - Math.exp(-dt * 2))
     ;(ru.uShadow.value as THREE.Color).lerp(colS, 1 - Math.exp(-dt * 2))
     ru.uAccentAmt.value += (m.accentAmt - ru.uAccentAmt.value) * (1 - Math.exp(-dt * 2))
-    const grain = mobile ? 0.042 : 0.033
+    const grain = mobile ? 0.05 : 0.033
     ru.uSize.value = (grain * size.height * gl.getPixelRatio()) / 2 / Math.tan((50 * Math.PI) / 360)
 
     ru.uTime.value = time
