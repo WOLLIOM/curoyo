@@ -447,6 +447,8 @@ export default function Particles() {
     let unbind: (() => void) | null = null
     let repairId = 0
     const timers: number[] = []
+    // The model files start downloading right away, so the tree and the others are cached long before they are built.
+    ;['tree', 'cradle', 'apple'].forEach((m) => void fetch(`/models/${m}.bin`).catch(() => {}))
     buildCore(S).then((core) => {
       if (cancelled) return
       const blank = () => dataTexture(new Float32Array(S * S * 4), S)
@@ -622,17 +624,17 @@ export default function Particles() {
             }
             void fill(name, t, n)
           }
-          const delay = weak ? 2500 + i * 1100 : 1500 + i * 600
+          const delay = weak ? 1000 + i * 900 : 200 + i * 500
           timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 4000 }) : run()), delay))
         })
       }
       const wait = window.setInterval(() => {
         if (live.go || cancelled) {
           window.clearInterval(wait)
-          if (!cancelled) timers.push(window.setTimeout(start, 2500))
+          if (!cancelled) timers.push(window.setTimeout(start, 800))
           // Self-repair: every few seconds, any shape that is still missing (failed, stalled, never started) is built again.
           const t0 = performance.now()
-          const grace = 2500 + (weak ? 2500 + list.length * 1100 : 1500 + list.length * 600) + 5000
+          const grace = 800 + (weak ? 1000 + list.length * 900 : 200 + list.length * 500) + 5000
           const repair = window.setInterval(() => {
             if (cancelled || document.hidden || performance.now() - t0 < grace) return
             list.forEach(([name, t, n]) => {
