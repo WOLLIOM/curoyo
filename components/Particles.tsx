@@ -440,6 +440,7 @@ export default function Particles() {
   useEffect(() => {
     let cancelled = false
     let built: Engine | null = null
+    let unbind: (() => void) | null = null
     const timers: number[] = []
     buildCore(S).then((core) => {
       if (cancelled) return
@@ -574,9 +575,28 @@ export default function Particles() {
       const list = weak ? jobs.filter(([name]) => name !== 'spaces') : jobs
       // Nothing starts until the intro has finished and the logo has held for a moment: building these during
       // the snake-to-logo morph is what made the hero hitch.
+      let lastMove = 0
+      const bump = () => (lastMove = performance.now())
+      window.addEventListener('scroll', bump, { passive: true })
+      window.addEventListener('wheel', bump, { passive: true })
+      window.addEventListener('touchmove', bump, { passive: true })
+      timers.push(0)
+      unbind = () => {
+        window.removeEventListener('scroll', bump)
+        window.removeEventListener('wheel', bump)
+        window.removeEventListener('touchmove', bump)
+      }
       const start = () => {
         list.forEach(([name, t, n], i) => {
-          const run = () => void fill(name, t, n)
+          // A build never starts while you are scrolling or moving: it waits until the page has been still for a moment.
+          const run = () => {
+            if (cancelled) return
+            if (performance.now() - lastMove < 700) {
+              timers.push(window.setTimeout(run, 350))
+              return
+            }
+            void fill(name, t, n)
+          }
           const delay = weak ? 2500 + i * 1100 : 1500 + i * 600
           timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 4000 }) : run()), delay))
         })
@@ -591,6 +611,7 @@ export default function Particles() {
     })
     return () => {
       cancelled = true
+      unbind?.()
       timers.forEach((id) => window.clearTimeout(id))
       if (built) {
         built.gpu?.dispose()
@@ -680,6 +701,11 @@ export default function Particles() {
       document.documentElement.style.setProperty('--intro', String(introVar))
     }
 
+    // The portrait ignores the phone's tilt entirely: your face stays put.
+    const still = 1 - Math.min(1, (e.vel!.material.uniforms.uW2.value as THREE.Vector4).w * 1.6)
+    const tiltX = live.tilt.x * still
+    const tiltY = live.tilt.y * still
+
     // Which room are we in, and how far toward the next one?
     const rooms = size.width < 1000 ? ROOMS_STACKED : ROOMS_DESKTOP
     const last = rooms.length - 1
@@ -720,8 +746,8 @@ export default function Particles() {
     const swallow = A.target === 2 && B.target === 0
 
     g.scale.setScalar(lerp(g.scale.x, lerp(A.s, B.s, t) * base, k))
-    g.position.x += (lerp(A.x, B.x, t) * (viewport.width / 13.3) + live.tilt.x * 1.1 * st.depth - g.position.x) * k
-    g.position.y += (lerp(A.y, B.y, t) - live.tilt.y * 0.7 * st.depth - g.position.y) * k
+    g.position.x += (lerp(A.x, B.x, t) * (viewport.width / 13.3) + tiltX * 1.1 * st.depth - g.position.x) * k
+    g.position.y += (lerp(A.y, B.y, t) - tiltY * 0.7 * st.depth - g.position.y) * k
     g.rotation.z += (lerp(A.rz, B.rz, t) - g.rotation.z) * k
 
     // Cursor / gyro parallax: tiny, physical.
@@ -731,8 +757,8 @@ export default function Particles() {
     const py = live.pointer.active ? ny : 0
     const depthTarget = reduced ? 0 : live.interacted || s > 0.05 ? 1 : 0
     st.depth += (depthTarget - st.depth) * (1 - Math.exp(-dt * 0.9))
-    const tx = reduced ? 0 : (px * 0.12 + live.tilt.x * 0.95) * st.depth
-    const ty = reduced ? 0 : (-py * 0.08 - live.tilt.y * 0.6) * st.depth
+    const tx = reduced ? 0 : (px * 0.12 + tiltX * 0.95) * st.depth
+    const ty = reduced ? 0 : (-py * 0.08 - tiltY * 0.6) * st.depth
     st.rotY += (tx - st.rotY) * (1 - Math.exp(-dt * 3))
     st.rotX += (ty - st.rotX) * (1 - Math.exp(-dt * 3))
     g.rotation.y = st.rotY
@@ -757,8 +783,8 @@ export default function Particles() {
     const time = state.clock.elapsedTime
     if (live.pointer.active) lightTarget.set(local.x, local.y, 2.4)
     else lightTarget.set(Math.cos(time * 0.22) * 3.5, 1.5 + Math.sin(time * 0.17) * 1.5, 2.8)
-    lightTarget.x += live.tilt.x * 3
-    lightTarget.y -= live.tilt.y * 2
+    lightTarget.x += tiltX * 3
+    lightTarget.y -= tiltY * 2
     light.lerp(lightTarget, 1 - Math.exp(-dt * 3))
 
     // Text hover and the music both make the form breathe.
@@ -829,7 +855,7 @@ export default function Particles() {
     const wireTarget = Math.min(3, Math.max(0, (s - 4.6) * 1.5))
     st.wire += (wireTarget - st.wire) * (1 - Math.exp(-dt * 7))
     vu.uWire.value = st.wire
-    ;(vu.uGrav.value as THREE.Vector2).set(reduced ? 0 : live.tilt.x, reduced ? 0 : -live.tilt.y)
+    ;(vu.uGrav.value as THREE.Vector2).set(reduced ? 0 : tiltX, reduced ? 0 : -tiltY)
     ;(vu.uMouse.value as THREE.Vector2).set(local.x, local.y)
     ;(vu.uMouseVel.value as THREE.Vector2).copy(mouseVel)
 

@@ -19,6 +19,35 @@ export default function LiveTypes() {
     return () => window.clearTimeout(t)
   }, [ready])
   const [active, setActive] = useState<Set<HTMLElement>>(new Set())
+  // Each headline builds its own GPU simulation, so they wake one at a time and never while you are scrolling.
+  const [mounted, setMounted] = useState<Set<HTMLElement>>(new Set())
+  useEffect(() => {
+    if (!armed) return
+    let lastScroll = 0
+    const onScroll = () => (lastScroll = performance.now())
+    window.addEventListener('scroll', onScroll, { passive: true })
+    const id = window.setInterval(() => {
+      setMounted((prev) => {
+        const keep = new Set([...prev].filter((e) => active.has(e)))
+        let changed = keep.size !== prev.size
+        if (performance.now() - lastScroll > 450) {
+          const vh = window.innerHeight
+          const next = [...active]
+            .filter((e) => !keep.has(e))
+            .sort((a, b) => Math.abs(a.getBoundingClientRect().top - vh * 0.4) - Math.abs(b.getBoundingClientRect().top - vh * 0.4))[0]
+          if (next) {
+            keep.add(next)
+            changed = true
+          }
+        }
+        return changed ? keep : prev
+      })
+    }, 450)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.clearInterval(id)
+    }
+  }, [armed, active])
   const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 88 : tier() === 'low' ? 112 : 144), [])
 
   useEffect(() => {
@@ -66,7 +95,7 @@ export default function LiveTypes() {
   return (
     <>
       {els
-        .filter((el) => armed && !lite() && active.has(el))
+        .filter((el) => armed && !lite() && mounted.has(el))
         .map((el, i) => (
           <LiveMark key={el.dataset.live || i} anchor={el} size={size} load={buildTextData} hideAnchor />
         ))}
