@@ -8,6 +8,7 @@ import { BAMBOO_BASE, BAMBOO_SPAN, buildCore, buildFormation, CRADLE_PIVOT_Y, ty
 import { dataTexture, particleGeometry } from '@/lib/gl'
 import { MODES, live, useStore } from '@/lib/store'
 import { sound } from '@/lib/sound'
+import { tier } from '@/lib/perf'
 
 // ---------- GPU simulation: every particle is a mass on a spring, pulled toward its formation ----------
 
@@ -387,7 +388,9 @@ export default function Particles() {
   const engine = useRef<Engine | null>(null)
   const { camera, size, viewport, gl } = useThree()
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
-  const S = mobile ? 96 : 192
+  const level = useMemo(() => tier(), [])
+  const weak = level === 'low'
+  const S = mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
@@ -466,7 +469,7 @@ export default function Particles() {
       const textures = Object.values(tex)
 
       const gpu = new GPUComputationRenderer(S, S, gl)
-      if (mobile || /iPad|iPhone|iPod/.test(navigator.userAgent)) gpu.setDataType(THREE.HalfFloatType)
+      if (weak || mobile || /iPad|iPhone|iPod/.test(navigator.userAgent)) gpu.setDataType(THREE.HalfFloatType)
       const pos0 = gpu.createTexture()
       ;(pos0.image.data as unknown as Float32Array).set(reduced ? core.snake : core.scatter)
       const vel0 = gpu.createTexture()
@@ -567,10 +570,10 @@ export default function Particles() {
       // and (on phones) well after the hero has settled, so the intro and first scroll stay smooth.
       const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
       // The pavilion is the heaviest object: phones keep the light ring there instead of building it.
-      const list = mobile ? jobs.filter(([name]) => name !== 'spaces') : jobs
+      const list = weak ? jobs.filter(([name]) => name !== 'spaces') : jobs
       list.forEach(([name, t, n], i) => {
         const run = () => void fill(name, t, n)
-        const delay = mobile ? 3500 + i * 1100 : 700 + i * 350
+        const delay = weak ? 3500 + i * 1100 : 700 + i * 350
         timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 2500 }) : run()), delay))
       })
     })
@@ -583,7 +586,7 @@ export default function Particles() {
       }
       engine.current = null
     }
-  }, [S, gl, material, mobile, reduced])
+  }, [S, gl, material, mobile, weak, reduced])
 
   useEffect(
     () => () => {
@@ -645,7 +648,7 @@ export default function Particles() {
     if (!g || !e) return
     const st = state0.current
     // Fixed-size physics steps; when frames drop, take a few catch-up steps so motion stays physical.
-    const steps = Math.min(mobile ? 2 : 3, Math.max(1, Math.ceil(delta / (1 / 30))))
+    const steps = Math.min(weak ? 2 : 3, Math.max(1, Math.ceil(delta / (1 / 30))))
     const sdt = Math.min(delta / steps, 1 / 30)
     const dt = Math.min(delta, 1 / 30)
     st.sim += sdt * steps
@@ -759,7 +762,7 @@ export default function Particles() {
     ;(ru.uColorB.value as THREE.Color).lerp(colB, 1 - Math.exp(-dt * 2))
     ;(ru.uShadow.value as THREE.Color).lerp(colS, 1 - Math.exp(-dt * 2))
     ru.uAccentAmt.value += (m.accentAmt - ru.uAccentAmt.value) * (1 - Math.exp(-dt * 2))
-    const grain = mobile ? 0.05 : 0.033
+    const grain = mobile ? 0.05 : weak ? 0.04 : 0.033
     ru.uSize.value = (grain * size.height * gl.getPixelRatio()) / 2 / Math.tan((50 * Math.PI) / 360)
 
     ru.uTime.value = time

@@ -4,11 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { buildWordmarkData } from '@/lib/targets'
 import { useStore } from '@/lib/store'
 import LiveMark from './LiveMark'
+import { tier } from '@/lib/perf'
 
 // The CUROYO wordmark as live matter, gathering just after the snake.
 export default function Wordmark3D() {
   const [el, setEl] = useState<HTMLElement | null>(null)
-  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 96 : 176), [])
+  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 96 : tier() === 'low' ? 128 : 176), [])
 
   useEffect(() => {
     let raf = 0

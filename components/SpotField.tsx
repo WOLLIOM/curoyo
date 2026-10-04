@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { MODES, live } from '@/lib/store'
+import { tier } from '@/lib/perf'
 
 // The background is made of the logo's own spots: bean shapes drifting in depth.
 // They move with scroll, cursor and phone tilt at different rates, so the space has layers.
@@ -66,7 +67,7 @@ export default function SpotField() {
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
   )
-  const count = mobile ? 160 : 360
+  const count = mobile ? 160 : tier() === 'low' ? 240 : 360
   const geometry = useMemo(() => {
     const g = new THREE.BufferGeometry()
     const pos = new Float32Array(count * 3)

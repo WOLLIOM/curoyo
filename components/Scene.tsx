@@ -7,6 +7,7 @@ import Particles from './Particles'
 import Wordmark3D from './Wordmark3D'
 import SpotField from './SpotField'
 import LiveTypes from './LiveTypes'
+import { tier } from '@/lib/perf'
 
 // Development only: with ?step in the URL the scene runs on a manual clock, so it can be inspected frame by frame.
 function Stepper() {
@@ -37,10 +38,11 @@ export default function Scene() {
   useEffect(() => {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
-    const top = Math.min(window.devicePixelRatio || 1, phone ? 2 : 1.75)
+    const weak = tier() === 'low'
+    const top = Math.min(window.devicePixelRatio || 1, phone ? 2 : weak ? 1.25 : 1.75)
     setMaxDpr(top)
     // Start a notch below the ceiling; the monitor climbs back up if the device has room to spare.
-    setDpr(Math.min(top, phone ? 1 : 1.5))
+    setDpr(Math.min(top, phone || weak ? 1 : 1.5))
     setMounted(true)
   }, [])
   if (!mounted) return null

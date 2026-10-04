@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { tier } from '@/lib/perf'
 
 // A real client build (Ovenlight): the site's own pizza model, turned into grains in the browser. Pick toppings and they
 // drop on; drag to spin. Points are sampled from the GLB's triangles, so every node can be switched on and off.
@@ -235,7 +236,7 @@ export default function PizzaShowcase() {
       ([e]) => {
         if (!e.isIntersecting) return
         near.disconnect()
-        loadCloud(phone ? 22000 : 60000)
+        loadCloud(phone ? 22000 : tier() === 'low' ? 34000 : 60000)
           .then((c) => {
             if (dead) return
             cloud = c

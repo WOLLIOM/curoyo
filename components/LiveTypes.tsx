@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { buildTextData } from '@/lib/livetype'
 import LiveMark from './LiveMark'
+import { tier } from '@/lib/perf'
 
 // Headlines marked with data-live become live type when they come near the screen,
 // and dissolve back to plain text (and free their GPU memory) when they're far away.
 export default function LiveTypes() {
   const [els, setEls] = useState<HTMLElement[]>([])
   const [active, setActive] = useState<Set<HTMLElement>>(new Set())
-  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 88 : 144), [])
+  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 88 : tier() === 'low' ? 112 : 144), [])
 
   useEffect(() => {
     let raf = 0
