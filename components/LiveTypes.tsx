@@ -9,7 +9,7 @@ import LiveMark from './LiveMark'
 export default function LiveTypes() {
   const [els, setEls] = useState<HTMLElement[]>([])
   const [active, setActive] = useState<Set<HTMLElement>>(new Set())
-  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 104 : 144), [])
+  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 88 : 144), [])
 
   useEffect(() => {
     let raf = 0

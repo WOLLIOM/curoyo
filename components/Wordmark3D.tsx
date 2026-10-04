@@ -8,7 +8,7 @@ import LiveMark from './LiveMark'
 // The CUROYO wordmark as live matter, gathering just after the snake.
 export default function Wordmark3D() {
   const [el, setEl] = useState<HTMLElement | null>(null)
-  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 112 : 176), [])
+  const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 96 : 176), [])
 
   useEffect(() => {
     let raf = 0

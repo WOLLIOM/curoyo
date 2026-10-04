@@ -387,7 +387,7 @@ export default function Particles() {
   const engine = useRef<Engine | null>(null)
   const { camera, size, viewport, gl } = useThree()
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
-  const S = mobile ? 112 : 192
+  const S = mobile ? 96 : 192
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
@@ -566,7 +566,9 @@ export default function Particles() {
       // Each build is a burst of main-thread work, so they run one at a time, only when the browser is idle,
       // and (on phones) well after the hero has settled, so the intro and first scroll stay smooth.
       const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
-      jobs.forEach(([name, t, n], i) => {
+      // The pavilion is the heaviest object: phones keep the light ring there instead of building it.
+      const list = mobile ? jobs.filter(([name]) => name !== 'spaces') : jobs
+      list.forEach(([name, t, n], i) => {
         const run = () => void fill(name, t, n)
         const delay = mobile ? 3500 + i * 1100 : 700 + i * 350
         timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 2500 }) : run()), delay))

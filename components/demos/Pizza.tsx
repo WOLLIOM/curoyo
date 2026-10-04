@@ -230,14 +230,23 @@ export default function PizzaShowcase() {
     const ro = new ResizeObserver(resize)
     ro.observe(cv)
 
-    loadCloud(phone ? 30000 : 60000)
-      .then((c) => {
-        if (dead) return
-        cloud = c
-        vis = c.names.map(() => 0)
-        setState('ready')
-      })
-      .catch(() => !dead && setState('error'))
+    // The 1.6 MB model is only fetched and sampled once the showcase is about a screen away.
+    const near = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return
+        near.disconnect()
+        loadCloud(phone ? 22000 : 60000)
+          .then((c) => {
+            if (dead) return
+            cloud = c
+            vis = c.names.map(() => 0)
+            setState('ready')
+          })
+          .catch(() => !dead && setState('error'))
+      },
+      { rootMargin: '100% 0px' }
+    )
+    near.observe(cv)
 
     let vis: number[] = []
     let rot = 0.6
@@ -350,6 +359,7 @@ export default function PizzaShowcase() {
       cancelAnimationFrame(raf)
       ro.disconnect()
       io.disconnect()
+      near.disconnect()
       cv.removeEventListener('pointerdown', onDown)
       cv.removeEventListener('pointermove', onMove)
       cv.removeEventListener('pointerup', onUp)
