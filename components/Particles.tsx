@@ -373,6 +373,8 @@ const ROOMS_STACKED: Room[] = [
 // The pricing room shows the chosen plan: an apple, a tree, a planet, a galaxy.
 const PRICING_ROOM = 10
 const PLAN_TARGET: Room['target'][] = [3, 11, 5, 4]
+// Which background-built formation each target needs (the snake and the wireframe need none).
+const TARGET_FORMATION: (FormationName | null)[] = [null, 'spaces', 'apple', 'orbit', 'cloud', 'galaxy', 'tree', 'portrait', 'bamboo', 'cradle', 'peaks', null]
 
 function smooth(e0: number, e1: number, x: number) {
   const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)))
@@ -391,6 +393,7 @@ interface Engine {
 export default function Particles() {
   const groupRef = useRef<THREE.Group>(null)
   const engine = useRef<Engine | null>(null)
+  const need = useRef<((name: FormationName) => void) | null>(null)
   const { camera, size, viewport, gl } = useThree()
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
   const level = useMemo(() => tier(), [])
@@ -597,6 +600,12 @@ export default function Particles() {
       const ric = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
       // The pavilion is the heaviest object: phones keep the light ring there instead of building it.
       const list = weak ? jobs.filter(([name]) => name !== 'spaces') : jobs
+      // On demand: the shape of the room you are in (or about to enter) jumps the queue and builds right away.
+      need.current = (name) => {
+        if (cancelled || !live.go || done.has(name) || busy.has(name)) return
+        const job = list.find(([n]) => n === name)
+        if (job) void fill(job[0], job[1], job[2])
+      }
       // Nothing starts until the intro has finished and the logo has held for a moment: building these during
       // the snake-to-logo morph is what made the hero hitch.
       let lastMove = 0
@@ -622,7 +631,7 @@ export default function Particles() {
               timers.push(window.setTimeout(run, 350))
               return
             }
-            void fill(name, t, n)
+            if (!done.has(name) && !busy.has(name)) void fill(name, t, n)
           }
           const delay = weak ? 1000 + i * 900 : 200 + i * 500
           timers.push(window.setTimeout(() => (ric ? ric(run, { timeout: 4000 }) : run()), delay))
@@ -657,6 +666,7 @@ export default function Particles() {
         built.textures.forEach((t) => t.dispose())
       }
       engine.current = null
+      need.current = null
     }
   }, [S, gl, material, mobile, weak, reduced])
 
@@ -712,13 +722,20 @@ export default function Particles() {
   const wT = useMemo(() => new THREE.Vector4(), [])
   const wT2 = useMemo(() => new THREE.Vector4(), [])
   const wT3 = useMemo(() => new THREE.Vector4(), [])
-  const state0 = useRef({ sim: 0, lastIntroVar: -1, depth: 0, pulse: 0, rotX: 0, rotY: 0, msk: 0, grow: 0, wire: 0, lastS: 0, idle: 0, settle: 0 })
+  const state0 = useRef({ sim: 0, lastIntroVar: -1, depth: 0, pulse: 0, rotX: 0, rotY: 0, msk: 0, grow: 0, wire: 0, lastS: 0, idle: 0, settle: 0, need: 0 })
 
   useFrame((state, delta) => {
+    // A bad frame time (clock hiccup, resumed tab) must never reach the physics.
+    delta = delta > 0 && delta < 1 ? delta : 1 / 60
     const g = groupRef.current
     const e = engine.current
     if (!g || !e) return
     const st = state0.current
+    // Self-heal: if any state value ever went non-finite, start it clean instead of freezing the form for good.
+    for (const k in st) {
+      const key = k as keyof typeof st
+      if (!Number.isFinite(st[key])) st[key] = key === 'lastIntroVar' ? -1 : key === 'sim' ? 9 : 0
+    }
     // Fixed-size physics steps; when frames drop, take a few catch-up steps so motion stays physical.
     const steps = Math.min(weak ? 2 : 3, Math.max(1, Math.ceil(delta / (1 / 30))))
     const sdt = Math.min(delta / steps, 1 / 30)
@@ -782,12 +799,27 @@ export default function Particles() {
     }
     add(A.target, 1 - t)
     add(B.target, t)
+    // Every quarter second, make sure the shapes for this room and the next two exist (or are being built).
+    st.need += dt
+    if (st.need > 0.25 && need.current) {
+      st.need = 0
+      for (let r = i; r <= Math.min(last, i + 2); r++) {
+        const tg = r === PRICING_ROOM ? PLAN_TARGET[live.plan] : rooms[r].target
+        const nm = TARGET_FORMATION[tg]
+        if (nm) need.current(nm)
+      }
+    }
     const swallow = A.target === 2 && B.target === 0
 
     g.scale.setScalar(lerp(g.scale.x, lerp(A.s, B.s, t) * base, k))
     g.position.x += (lerp(A.x, B.x, t) * (viewport.width / 13.3) + tiltX * 1.1 * st.depth - g.position.x) * k
     g.position.y += (lerp(A.y, B.y, t) - tiltY * 0.7 * st.depth - g.position.y) * k
     g.rotation.z += (lerp(A.rz, B.rz, t) - g.rotation.z) * k
+    if (!Number.isFinite(g.position.x + g.position.y + g.scale.x + g.rotation.x + g.rotation.y + g.rotation.z)) {
+      g.position.set(0, 0, 0)
+      g.rotation.set(0, 0, 0)
+      g.scale.setScalar(1)
+    }
 
     // Cursor / gyro parallax: tiny, physical.
     const nx = (live.pointer.x / size.width) * 2 - 1
@@ -856,6 +888,13 @@ export default function Particles() {
     const w = vu.uW.value as THREE.Vector4
     const w2 = vu.uW2.value as THREE.Vector4
     const w3 = vu.uW3.value as THREE.Vector4
+    const bad = (v: THREE.Vector4) => !(Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z) && Number.isFinite(v.w))
+    if (bad(w) || bad(w2) || bad(w3)) {
+      w.copy(wT)
+      w2.copy(wT2)
+      w3.copy(wT3)
+    }
+    if (!Number.isFinite(ru.uDim.value)) ru.uDim.value = 1
     if (swallow) {
       w.copy(wT)
       w2.copy(wT2)

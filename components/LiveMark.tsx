@@ -276,6 +276,8 @@ export default function LiveMark({ anchor, size: S, load, start = 0, onReady, hi
   const st = useRef({ sim: 0, depth: 0, msk: 0 })
 
   useFrame((state, delta) => {
+    // A bad frame time (clock hiccup, resumed tab) must never reach the physics.
+    delta = delta > 0 && delta < 1 ? delta : 1 / 60
     const g = groupRef.current
     const e = engine.current
     if (!g || !e) return
@@ -288,6 +290,9 @@ export default function LiveMark({ anchor, size: S, load, start = 0, onReady, hi
     const perPx = (2 * cam.position.z * Math.tan((cam.fov * Math.PI) / 360)) / size.height
     g.position.set((r.left + r.width / 2 - size.width / 2) * perPx, -(r.top + r.height / 2 - size.height / 2) * perPx, 0.5)
     g.scale.setScalar(Math.max(r.width, 1) * perPx)
+    // The live headline leans in 3D with the phone, inside the GPU, so the page never has to restyle.
+    g.rotation.y += (live.tilt.x * 0.3 - g.rotation.y) * 0.2
+    g.rotation.x += (-live.tilt.y * 0.22 - g.rotation.x) * 0.2
     g.visible = r.bottom > -40 && r.top < size.height + 40
     if (!g.visible) return
 

@@ -115,6 +115,8 @@ export default function SpotField() {
   const colB = useMemo(() => new THREE.Color(), [])
 
   useFrame((state, delta) => {
+    // A bad frame time (clock hiccup, resumed tab) must never reach the physics.
+    delta = delta > 0 && delta < 1 ? delta : 1 / 60
     const u = material.uniforms
     const dt = Math.min(delta, 0.1)
     u.uTime.value = state.clock.elapsedTime * (reduced ? 0.2 : 1)

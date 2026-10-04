@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Particles from './Particles'
 import Wordmark3D from './Wordmark3D'
 import SpotField from './SpotField'
@@ -12,28 +12,59 @@ import { useStore } from '@/lib/store'
 
 // Development only: with ?step in the URL the scene runs on a manual clock, so it can be inspected frame by frame.
 // When even the lowest resolution can't hold a smooth frame rate, render at a steady 30 fps instead of fighting for 60.
-const beat = { t: 0, gl: null as null | { isContextLost: () => boolean } }
-function Beat() {
+// Heartbeat state for the canvas that is mounted right now. `frames` counts frames drawn by it, so a canvas that is
+// still compiling its shaders is never mistaken for a frozen one.
+const beat = { t: 0, frames: 0, gl: null as null | WebGLRenderingContext | WebGL2RenderingContext }
+function Beat({ restart }: { restart: () => void }) {
+  const gl = useThree((s) => s.gl)
+  useEffect(() => {
+    const ctx = gl.getContext()
+    const c = gl.domElement
+    let alive = true
+    beat.gl = ctx
+    beat.t = performance.now()
+    beat.frames = 0
+    const lost = (e: Event) => {
+      e.preventDefault()
+      // If the browser does not give this context back, make a new one.
+      window.setTimeout(() => alive && ctx.isContextLost() && restart(), 1200)
+    }
+    const restored = () => alive && restart()
+    c.addEventListener('webglcontextlost', lost)
+    c.addEventListener('webglcontextrestored', restored)
+    return () => {
+      // This canvas is going away on purpose (three.js then drops its context): stop watching it.
+      alive = false
+      c.removeEventListener('webglcontextlost', lost)
+      c.removeEventListener('webglcontextrestored', restored)
+      if (beat.gl === ctx) beat.gl = null
+    }
+  }, [gl, restart])
   useFrame(() => {
     beat.t = performance.now()
+    beat.frames++
   })
   return null
 }
 
 function Throttle() {
   const advance = useThree((s) => s.advance)
+  const get = useThree((s) => s.get)
   useEffect(() => {
     let raf = 0
     let last = 0
     const loop = (t: number) => {
       raf = requestAnimationFrame(loop)
       if (document.hidden || t - last < 31) return
+      // Step the scene's own clock forward. (Passing the rAF timestamp mixed two clocks: on some browsers it gave
+      // one huge negative frame that turned the whole particle sim into NaN, freezing or blanking every shape.)
+      const step = last ? Math.min(0.1, Math.max(0.001, (t - last) / 1000)) : 1 / 30
       last = t
-      advance(t / 1000)
+      advance(get().clock.elapsedTime + step)
     }
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
-  }, [advance])
+  }, [advance, get])
   return null
 }
 
@@ -65,6 +96,7 @@ export default function Scene() {
   const [slow, setSlow] = useState(false)
   // If the browser drops the GPU context (heavy load, tab switch), every shape texture is lost: rebuild the whole scene.
   const [epoch, setEpoch] = useState(0)
+  const restarts = useRef<number[]>([])
   useEffect(() => {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
@@ -116,26 +148,27 @@ export default function Scene() {
       cancelAnimationFrame(raf)
     }
   }, [step, ready])
-  // Heartbeat: if the scene stops drawing while the page is visible (a permission prompt, a webview that suspended
-  // the GPU), restart it instead of leaving the world frozen.
+  // Heartbeat: if the scene stops drawing while the page is visible (a webview that suspended the GPU, a lost
+  // context), restart it instead of leaving the world frozen. At most a few restarts a minute, so it can never loop.
+  const restart = useCallback(() => {
+    const now = performance.now()
+    restarts.current = restarts.current.filter((t) => now - t < 60000)
+    if (restarts.current.length >= 3) return
+    restarts.current.push(now)
+    beat.t = now
+    beat.frames = 0
+    beat.gl = null
+    setEpoch((n) => n + 1)
+  }, [])
   useEffect(() => {
     if (step) return
-    const id = window.setInterval(() => {
-      if (document.hidden || !beat.t) return
-      if (performance.now() - beat.t > 2500 || beat.gl?.isContextLost()) {
-        beat.t = performance.now()
-        setEpoch((n) => n + 1)
-      }
-    }, 1000)
-    // Coming back from another app (Telegram, Instagram, a call): the phone may have taken the GPU away meanwhile.
+    const frozen = () => !document.hidden && (beat.gl?.isContextLost() || (beat.frames > 10 && performance.now() - beat.t > 2500))
+    const id = window.setInterval(() => frozen() && restart(), 1000)
+    // Coming back from another app: the phone may have taken the GPU away meanwhile.
     const back = () => {
       if (document.hidden) return
-      window.setTimeout(() => {
-        if (beat.gl?.isContextLost() || performance.now() - beat.t > 1500) {
-          beat.t = performance.now()
-          setEpoch((n) => n + 1)
-        }
-      }, 700)
+      beat.t = performance.now()
+      window.setTimeout(() => frozen() && restart(), 1500)
     }
     document.addEventListener('visibilitychange', back)
     window.addEventListener('pageshow', back)
@@ -144,24 +177,13 @@ export default function Scene() {
       document.removeEventListener('visibilitychange', back)
       window.removeEventListener('pageshow', back)
     }
-  }, [step])
+  }, [step, restart])
   if (!mounted) return null
 
   return (
     <div className="fixed inset-0 z-0">
       <Canvas
         key={epoch}
-        onCreated={({ gl }) => {
-          const c = gl.domElement
-          beat.gl = gl.getContext()
-          beat.t = performance.now()
-          c.addEventListener('webglcontextlost', (e) => {
-            e.preventDefault()
-            // If the browser does not give the context back, make a new one.
-            window.setTimeout(() => beat.gl?.isContextLost() && setEpoch((n) => n + 1), 1200)
-          })
-          c.addEventListener('webglcontextrestored', () => setEpoch((n) => n + 1))
-        }}
         dpr={dpr}
         frameloop={step || slow ? 'never' : 'always'}
         gl={{ antialias: false, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: step }}
@@ -184,7 +206,7 @@ export default function Scene() {
             }}
           />
         )}
-        <Beat />
+        {!step && <Beat restart={restart} />}
         <SpotField />
         <Particles />
         <Wordmark3D />

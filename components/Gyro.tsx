@@ -52,14 +52,52 @@ export default function Gyro() {
       live.tilt.x += (clamp(gx / 13) - live.tilt.x) * 0.14
       live.tilt.y += (clamp(gy / 13) - live.tilt.y) * 0.14
       live.interacted = true
-      document.documentElement.style.setProperty('--tilt-x', live.tilt.x.toFixed(2))
-      document.documentElement.style.setProperty('--tilt-y', live.tilt.y.toFixed(2))
       if (Math.abs(live.tilt.x) > 0.08 || Math.abs(live.tilt.y) > 0.08) live.lastInput = performance.now()
     }
     window.addEventListener('deviceorientation', onOrient)
+
+    // The DOM side of the tilt: only headlines that are on screen, written once per frame and only when the
+    // angle really changed. (Writing a CSS variable on <html> per sensor event restyled the whole page 60 times
+    // a second and starved the particles on phones.) GPU headlines (data-live) lean inside the scene instead.
+    const seen = new Set<HTMLElement>()
+    const io = new IntersectionObserver((entries) =>
+      entries.forEach((en) => {
+        const el = en.target as HTMLElement
+        if (en.isIntersecting) seen.add(el)
+        else {
+          seen.delete(el)
+          el.style.transform = ''
+        }
+      })
+    )
+    document
+      .querySelectorAll<HTMLElement>('[data-react]:not([data-live])')
+      .forEach((el) => !el.closest('#about, #credentials') && io.observe(el))
+    const icon = () => document.querySelector<SVGElement>('.tilt-live')
+    let raf = 0
+    let lx = 9
+    let ly = 9
+    const loop = () => {
+      raf = requestAnimationFrame(loop)
+      const x = live.tilt.x
+      const y = live.tilt.y
+      if (Math.abs(x - lx) < 0.004 && Math.abs(y - ly) < 0.004) return
+      lx = x
+      ly = y
+      const tf = `perspective(700px) rotateY(${(x * 16).toFixed(2)}deg) rotateX(${(y * -12).toFixed(2)}deg)`
+      seen.forEach((el) => (el.style.transform = tf))
+      const ic = icon()
+      if (ic) ic.style.transform = `rotate(${(x * 30).toFixed(1)}deg)`
+    }
+    raf = requestAnimationFrame(loop)
     return () => {
       window.removeEventListener('deviceorientation', onOrient)
       document.documentElement.classList.remove('gyro-on')
+      cancelAnimationFrame(raf)
+      io.disconnect()
+      seen.forEach((el) => (el.style.transform = ''))
+      const ic = icon()
+      if (ic) ic.style.transform = ''
     }
   }, [gyroOn])
 

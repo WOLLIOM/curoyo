@@ -302,9 +302,7 @@ button {
   75% { transform: rotate(16deg); }
 }
 .tilt-live {
-  transform: rotate(calc(var(--tilt-x, 0) * 30deg));
   transform-origin: 50% 90%;
-  transition: transform 0.15s linear;
 }
 .invite-in {
   animation: invite-in 0.8s cubic-bezier(0.2, 0.9, 0.2, 1.2) both;
@@ -383,12 +381,4 @@ button {
 }
 
 
-/* Phone tilt: the headlines lean in 3D with the phone. */
-html.gyro-on [data-react] {
-  transform: perspective(700px) rotateY(calc(var(--tilt-x, 0) * 16deg)) rotateX(calc(var(--tilt-y, 0) * -12deg));
-  transition: transform 0.12s linear;
-}
-
-html.gyro-on #about [data-react], html.gyro-on #credentials [data-react] {
-  transform: none;
-}
+/* Phone tilt: the headlines lean in 3D with the phone (set per element by Gyro.tsx, only on screen). */
