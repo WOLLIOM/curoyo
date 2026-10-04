@@ -8,7 +8,7 @@ import CertObject, { type ObjKind } from './CertObject'
 const OBJ: Record<string, ObjKind> = {
   'aws-cloud-solutions-architect': 'cloud',
   'ibm-ai-engineering': 'neural',
-  'google-it-automation-python': 'gear',
+  'google-it-automation-python': 'python',
   'google-business-intelligence': 'chart',
   'github-pm': 'git',
   'cpp-advanced': 'cpp',
@@ -43,6 +43,10 @@ export interface Cert {
   courses?: number
   text?: string
   skills?: string[]
+  // A card's own colours and look when the issuer's are not enough (two Google programs on different subjects).
+  brand?: string
+  brand2?: string
+  look?: 'code' | 'biz'
 }
 
 const PROFESSIONAL: Cert[] = [
@@ -72,6 +76,9 @@ const PROFESSIONAL: Cert[] = [
     date: 'Sep 2026',
     text: 'Automate real IT work with Python: scripting, Git, troubleshooting and systems at scale in the cloud.',
     skills: ['Python', 'Git', 'Bash', 'Automation', 'Cloud'],
+    brand: '#4b8bbe',
+    brand2: '#ffd43b',
+    look: 'code',
   },
   {
     issuer: 'google',
@@ -81,6 +88,9 @@ const PROFESSIONAL: Cert[] = [
     date: 'Sep 2026',
     text: 'Turn raw data into dashboards and decisions.',
     skills: ['SQL', 'BigQuery', 'Tableau', 'Dashboards', 'Data modeling'],
+    brand: '#fbbc04',
+    brand2: '#34a853',
+    look: 'biz',
   },
 ]
 
@@ -115,8 +125,8 @@ const RECOGNITION = [
   { title: 'Waterloo Newtonian Medal', place: 'Medal', line: 'University of Waterloo, Centre for Education in Mathematics and Computing', year: '' },
 ]
 
-const ORDER: IssuerId[] = ['aws', 'adobe', 'microsoft', 'siemens', 'github', 'london', 'linkedin']
-const FIRST = 2 // issuer groups shown before "Show more"
+const ORDER: IssuerId[] = ['london', 'siemens', 'github', 'microsoft', 'aws', 'adobe', 'linkedin']
+const FIRST = 4 // issuer groups shown before "Show more"
 const TOTAL = PROFESSIONAL.length + COURSES.length
 const HIDDEN = ORDER.slice(FIRST).reduce((n, id) => n + COURSES.filter((c) => c.issuer === id).length, 0)
 
@@ -260,6 +270,36 @@ function Seal({ id, color }: { id: string; color: string }) {
   )
 }
 
+// The skills line speaks the program's language: a line of Python for the automation one, dashboard filters for
+// the business one, a plain list for the rest.
+function Skills({ c }: { c: Cert }) {
+  const s = c.skills ?? []
+  if (c.look === 'code')
+    return (
+      <span className="mt-4 inline-block rounded-lg px-3 py-2 font-mono text-[13px] font-bold" style={{ background: 'color-mix(in srgb, var(--brand) 16%, transparent)' }}>
+        <span style={{ color: 'var(--muted)' }}>&gt;&gt;&gt; </span>
+        <span style={{ color: 'var(--brand2)' }}>import</span> {s.map((k) => k.toLowerCase()).join(', ')}
+        <span className="code-caret" style={{ color: 'var(--brand2)' }}>▍</span>
+      </span>
+    )
+  if (c.look === 'biz')
+    return (
+      <span className="mt-4 flex flex-wrap gap-2">
+        {s.map((k, i) => (
+          <span key={k} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-extrabold" style={{ boxShadow: 'inset 0 0 0 1.5px color-mix(in srgb, var(--brand) 55%, transparent)' }}>
+            <span className="inline-block h-[9px] w-[3px] rounded-sm" style={{ background: i % 2 ? 'var(--brand2)' : 'var(--brand)' }} />
+            {k}
+          </span>
+        ))}
+      </span>
+    )
+  return (
+    <span className="mt-4 block text-[13px] font-bold" style={{ color: 'var(--muted)' }}>
+      {s.join(' · ')}
+    </span>
+  )
+}
+
 function Lead({ c, onOpen }: { c: Cert; onOpen: (c: Cert) => void }) {
   return (
     <button
@@ -270,7 +310,7 @@ function Lead({ c, onOpen }: { c: Cert; onOpen: (c: Cert) => void }) {
       }}
       onPointerEnter={() => sound.pluck(hashText(c.title))}
       className="issuer-card issuer-pop group grid w-full grid-cols-[auto_1fr] items-start gap-x-6 gap-y-4 py-8 text-left sm:grid-cols-[auto_1fr_auto] sm:gap-x-10"
-      style={{ ['--brand' as string]: ISSUER[c.issuer].color } as CSSProperties}
+      style={{ ['--brand' as string]: c.brand ?? ISSUER[c.issuer].color, ['--brand2' as string]: c.brand2 } as CSSProperties}
     >
       <span className="issuer-num font-display text-[clamp(64px,9vw,128px)] leading-[0.8]">{c.courses}</span>
       <span className="min-w-0">
@@ -287,9 +327,7 @@ function Lead({ c, onOpen }: { c: Cert; onOpen: (c: Cert) => void }) {
         <span className="mt-3 block max-w-[52ch] text-[16px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
           {c.text}
         </span>
-        <span className="mt-4 block text-[13px] font-bold" style={{ color: 'var(--muted)' }}>
-          {c.skills?.join(' · ')}
-        </span>
+        <Skills c={c} />
       </span>
       <span className="col-span-2 flex items-center justify-between gap-4 sm:col-span-1 sm:flex-col sm:items-end sm:self-center">
         {OBJ[c.img] && <CertObject kind={OBJ[c.img]} size={150} />}

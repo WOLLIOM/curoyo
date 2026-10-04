@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 
 // A small turning object made of points for a certificate: the cloud for AWS, a neural net for AI, and so on.
 // It follows the site's grain: the same dots, the same rust, and it spins faster when you reach for it.
-export type ObjKind = 'cloud' | 'neural' | 'gear' | 'chart' | 'git' | 'cpp' | 'data' | 'guitar' | 'brain' | 'pizza' | 'bowl'
+export type ObjKind = 'cloud' | 'neural' | 'gear' | 'chart' | 'git' | 'cpp' | 'data' | 'guitar' | 'brain' | 'pizza' | 'bowl' | 'python'
 
 type P = [number, number, number, number?] // x, y, z, and 1 for the accent colour
 const rnd = (a: number, b: number) => a + Math.random() * (b - a)
@@ -75,9 +75,65 @@ function build(kind: ObjKind): P[] {
       out.push([Math.cos(th) * 0.3, Math.sin(th) * 0.3, rnd(-0.14, 0.14)])
     }
   } else if (kind === 'chart') {
-    const hs = [0.5, 0.95, 0.7, 1.35, 1.05]
-    hs.forEach((h, i) => box([(i - 2) * 0.36, -0.7 + h / 2, 0], 0.24, h, 0.24, 90, out))
+    // A dashboard: growing bars, a trend line climbing over them in the accent colour, and a baseline.
+    const hs = [0.45, 0.7, 0.62, 1.0, 1.3]
+    hs.forEach((h, i) => box([(i - 2) * 0.36, -0.7 + h / 2, 0], 0.24, h, 0.24, 80, out))
     line([-0.95, -0.7, 0.3], [0.95, -0.7, 0.3], 40, out)
+    const tops: P[] = hs.map((h, i) => [(i - 2) * 0.36, -0.7 + h + 0.18, 0.2])
+    for (let i = 0; i < tops.length - 1; i++) for (let k = 0; k < 16; k++) {
+      const t = k / 15
+      out.push([tops[i][0] + (tops[i + 1][0] - tops[i][0]) * t, tops[i][1] + (tops[i + 1][1] - tops[i][1]) * t, 0.2, 1])
+    }
+    tops.forEach((p) => {
+      for (let k = 0; k < 14; k++) {
+        const a = (k / 14) * 6.283
+        out.push([p[0] + Math.cos(a) * 0.05, p[1] + Math.sin(a) * 0.05, 0.2, 1])
+      }
+    })
+    // An arrow head on the last point: up and to the right.
+    const e = tops[tops.length - 1]
+    line([e[0] + 0.14, e[1] + 0.14, 0.2, 1], [e[0] - 0.02, e[1] + 0.14, 0.2], 8, out)
+    line([e[0] + 0.14, e[1] + 0.14, 0.2, 1], [e[0] + 0.14, e[1] - 0.02, 0.2], 8, out)
+    out.slice(-16).forEach((p) => (p[3] = 1))
+  } else if (kind === 'python') {
+    // The two interlocked snakes of the Python logo, one in each colour, each with its eye.
+    const cv = document.createElement('canvas')
+    cv.width = 160
+    cv.height = 160
+    const c = cv.getContext('2d')
+    if (c) {
+      const rr = (x: number, y: number, w: number, h: number, r: number) => {
+        c.beginPath()
+        c.moveTo(x + r, y)
+        c.arcTo(x + w, y, x + w, y + h, r)
+        c.arcTo(x + w, y + h, x, y + h, r)
+        c.arcTo(x, y + h, x, y, r)
+        c.arcTo(x, y, x + w, y, r)
+        c.closePath()
+        c.fill()
+      }
+      c.fillStyle = '#f00'
+      rr(48, 8, 64, 46, 16)
+      rr(8, 46, 68, 58, 16)
+      c.fillStyle = '#0f0'
+      rr(48, 106, 64, 46, 16)
+      rr(84, 56, 68, 58, 16)
+      c.fillStyle = '#000'
+      c.beginPath()
+      c.arc(66, 24, 6, 0, 6.283)
+      c.arc(94, 136, 6, 0, 6.283)
+      c.fill()
+      const d = c.getImageData(0, 0, 160, 160).data
+      let guard = 0
+      while (out.length < 900 && guard++ < 60000) {
+        const x = Math.floor(rnd(0, 160))
+        const y = Math.floor(rnd(0, 160))
+        const i = (y * 160 + x) * 4
+        const blue = d[i] > 128
+        const yellow = d[i + 1] > 128
+        if (blue || yellow) out.push([(x - 80) / 80, -(y - 80) / 80, rnd(-0.12, 0.12), yellow ? 1 : 0])
+      }
+    }
   } else if (kind === 'git') {
     const main: P[] = Array.from({ length: 6 }, (_, i) => [-0.9 + i * 0.36, 0.45, 0] as P)
     const b1: P[] = [[-0.36, 0.45, 0], [-0.1, 0, 0.25], [0.26, -0.15, 0.3], [0.62, 0.45, 0]]
@@ -341,7 +397,7 @@ export default function CertObject({ kind, size = 160 }: { kind: ObjKind; size?:
         if (frame++ % 30 === 0) {
           const cs = getComputedStyle(cv)
           col = cs.color
-          hot = cs.getPropertyValue('--hot').trim() || col
+          hot = cs.getPropertyValue('--brand2').trim() || cs.getPropertyValue('--hot').trim() || col
         }
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
         ctx.clearRect(0, 0, size, size)
