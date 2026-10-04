@@ -1,6 +1,6 @@
 'use client'
 
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { PerformanceMonitor } from '@react-three/drei'
 import { useEffect, useState } from 'react'
 import Particles from './Particles'
@@ -12,6 +12,14 @@ import { useStore } from '@/lib/store'
 
 // Development only: with ?step in the URL the scene runs on a manual clock, so it can be inspected frame by frame.
 // When even the lowest resolution can't hold a smooth frame rate, render at a steady 30 fps instead of fighting for 60.
+const beat = { t: 0 }
+function Beat() {
+  useFrame(() => {
+    beat.t = performance.now()
+  })
+  return null
+}
+
 function Throttle() {
   const advance = useThree((s) => s.advance)
   useEffect(() => {
@@ -108,6 +116,19 @@ export default function Scene() {
       cancelAnimationFrame(raf)
     }
   }, [step, ready])
+  // Heartbeat: if the scene stops drawing while the page is visible (a permission prompt, a webview that suspended
+  // the GPU), restart it instead of leaving the world frozen.
+  useEffect(() => {
+    if (step) return
+    const id = window.setInterval(() => {
+      if (document.hidden || !beat.t) return
+      if (performance.now() - beat.t > 2500) {
+        beat.t = performance.now()
+        setEpoch((n) => n + 1)
+      }
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [step])
   if (!mounted) return null
 
   return (
@@ -141,6 +162,7 @@ export default function Scene() {
             }}
           />
         )}
+        <Beat />
         <SpotField />
         <Particles />
         <Wordmark3D />

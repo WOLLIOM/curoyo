@@ -222,6 +222,8 @@ void main() {
   acc -= v * mix(1.4, 1.7 * sqrt(max(k, 1.0)), gate);
 
   v += acc * uDt;
+  // A grain that ever goes non-finite (a lost frame, a stray sensor value) is reset instead of freezing the whole form.
+  if (!(abs(v.x) < 400.0 && abs(v.y) < 400.0 && abs(v.z) < 400.0)) v = vec3(0.0);
   gl_FragColor = vec4(v, 1.0);
 }
 `
@@ -232,7 +234,9 @@ void main() {
   vec2 uv = gl_FragCoord.xy / resolution.xy;
   vec3 p = texture2D(tPos, uv).xyz;
   vec3 v = texture2D(tVel, uv).xyz;
-  gl_FragColor = vec4(p + v * uDt, 1.0);
+  vec3 np = p + v * uDt;
+  if (!(abs(np.x) < 400.0 && abs(np.y) < 400.0 && abs(np.z) < 400.0)) np = vec3(0.0);
+  gl_FragColor = vec4(np, 1.0);
 }
 `
 
