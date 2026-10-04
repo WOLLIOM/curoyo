@@ -12,7 +12,7 @@ import { useStore } from '@/lib/store'
 
 // Development only: with ?step in the URL the scene runs on a manual clock, so it can be inspected frame by frame.
 // When even the lowest resolution can't hold a smooth frame rate, render at a steady 30 fps instead of fighting for 60.
-const beat = { t: 0 }
+const beat = { t: 0, gl: null as null | { isContextLost: () => boolean } }
 function Beat() {
   useFrame(() => {
     beat.t = performance.now()
@@ -122,12 +122,28 @@ export default function Scene() {
     if (step) return
     const id = window.setInterval(() => {
       if (document.hidden || !beat.t) return
-      if (performance.now() - beat.t > 2500) {
+      if (performance.now() - beat.t > 2500 || beat.gl?.isContextLost()) {
         beat.t = performance.now()
         setEpoch((n) => n + 1)
       }
     }, 1000)
-    return () => window.clearInterval(id)
+    // Coming back from another app (Telegram, Instagram, a call): the phone may have taken the GPU away meanwhile.
+    const back = () => {
+      if (document.hidden) return
+      window.setTimeout(() => {
+        if (beat.gl?.isContextLost() || performance.now() - beat.t > 1500) {
+          beat.t = performance.now()
+          setEpoch((n) => n + 1)
+        }
+      }, 700)
+    }
+    document.addEventListener('visibilitychange', back)
+    window.addEventListener('pageshow', back)
+    return () => {
+      window.clearInterval(id)
+      document.removeEventListener('visibilitychange', back)
+      window.removeEventListener('pageshow', back)
+    }
   }, [step])
   if (!mounted) return null
 
@@ -137,7 +153,13 @@ export default function Scene() {
         key={epoch}
         onCreated={({ gl }) => {
           const c = gl.domElement
-          c.addEventListener('webglcontextlost', (e) => e.preventDefault())
+          beat.gl = gl.getContext()
+          beat.t = performance.now()
+          c.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault()
+            // If the browser does not give the context back, make a new one.
+            window.setTimeout(() => beat.gl?.isContextLost() && setEpoch((n) => n + 1), 1200)
+          })
           c.addEventListener('webglcontextrestored', () => setEpoch((n) => n + 1))
         }}
         dpr={dpr}
