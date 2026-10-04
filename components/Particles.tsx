@@ -445,6 +445,7 @@ export default function Particles() {
     let cancelled = false
     let built: Engine | null = null
     let unbind: (() => void) | null = null
+    let repairId = 0
     const timers: number[] = []
     buildCore(S).then((core) => {
       if (cancelled) return
@@ -551,8 +552,11 @@ export default function Particles() {
       // Everything the visitor will meet later loads quietly in the background, nearest first.
       if (!built.gpu) return
       // A failed or empty build (a model that did not load, a stalled worker) is retried, so a shape can never stay blank.
-      const fill = (name: FormationName, t: THREE.DataTexture, n?: THREE.DataTexture, tries = 0): Promise<void> =>
-        buildFormation(name, S)
+      const done = new Set<string>()
+      const busy = new Set<string>()
+      const fill = (name: FormationName, t: THREE.DataTexture, n?: THREE.DataTexture, tries = 0): Promise<void> => {
+        busy.add(name)
+        return buildFormation(name, S)
           .then((f) => {
             if (cancelled) return
             if (!f || !f.pos || f.pos.length === 0) throw new Error('empty formation')
@@ -562,14 +566,18 @@ export default function Particles() {
               ;(n.image.data as unknown as Float32Array).set(f.nrm)
               n.needsUpdate = true
             }
+            done.add(name)
+            busy.delete(name)
           })
           .catch((err) => {
+            busy.delete(name)
             if (cancelled || tries >= 4) {
               console.warn('CUROYO: formation failed', name, err)
               return
             }
             timers.push(window.setTimeout(() => void fill(name, t, n, tries + 1), 1500 * (tries + 1)))
           })
+      }
       const jobs: [FormationName, THREE.DataTexture, THREE.DataTexture?][] = [
         ['tree', tex.tree, tex.nTree],
         ['cradle', tex.cradle, tex.nCradle],
@@ -622,6 +630,17 @@ export default function Particles() {
         if (live.go || cancelled) {
           window.clearInterval(wait)
           if (!cancelled) timers.push(window.setTimeout(start, 2500))
+          // Self-repair: every few seconds, any shape that is still missing (failed, stalled, never started) is built again.
+          const t0 = performance.now()
+          const grace = 2500 + (weak ? 2500 + list.length * 1100 : 1500 + list.length * 600) + 5000
+          const repair = window.setInterval(() => {
+            if (cancelled || document.hidden || performance.now() - t0 < grace) return
+            list.forEach(([name, t, n]) => {
+              if (!done.has(name) && !busy.has(name)) void fill(name, t, n)
+            })
+          }, 6000)
+          timers.push(repair)
+          repairId = repair
         }
       }, 250)
       timers.push(wait)
@@ -629,6 +648,7 @@ export default function Particles() {
     return () => {
       cancelled = true
       unbind?.()
+      window.clearInterval(repairId)
       timers.forEach((id) => window.clearTimeout(id))
       if (built) {
         built.gpu?.dispose()
