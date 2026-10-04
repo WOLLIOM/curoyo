@@ -382,3 +382,9 @@ button {
   }
 }
 
+
+/* Phone tilt: the headlines lean in 3D with the phone. */
+html.gyro-on [data-react] {
+  transform: perspective(700px) rotateY(calc(var(--tilt-x, 0) * 16deg)) rotateX(calc(var(--tilt-y, 0) * -12deg));
+  transition: transform 0.12s linear;
+}

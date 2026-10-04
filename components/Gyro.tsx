@@ -32,8 +32,10 @@ export default function Gyro() {
       live.tilt.x = 0
       live.tilt.y = 0
       listenForShake(false)
+      document.documentElement.classList.remove('gyro-on')
       return
     }
+    document.documentElement.classList.add('gyro-on')
     let base: { b: number; g: number } | null = null
     const onOrient = (e: DeviceOrientationEvent) => {
       if (e.beta == null || e.gamma == null) return
@@ -47,14 +49,18 @@ export default function Gyro() {
       else if (angle === 270 || angle === -90) [gx, gy] = [-gy, gx]
       base.g += (e.gamma - base.g) * 0.004
       base.b += (e.beta - base.b) * 0.004
-      live.tilt.x += (clamp(gx / 22) - live.tilt.x) * 0.14
-      live.tilt.y += (clamp(gy / 22) - live.tilt.y) * 0.14
+      live.tilt.x += (clamp(gx / 13) - live.tilt.x) * 0.14
+      live.tilt.y += (clamp(gy / 13) - live.tilt.y) * 0.14
       live.interacted = true
       document.documentElement.style.setProperty('--tilt-x', live.tilt.x.toFixed(2))
+      document.documentElement.style.setProperty('--tilt-y', live.tilt.y.toFixed(2))
       if (Math.abs(live.tilt.x) > 0.08 || Math.abs(live.tilt.y) > 0.08) live.lastInput = performance.now()
     }
     window.addEventListener('deviceorientation', onOrient)
-    return () => window.removeEventListener('deviceorientation', onOrient)
+    return () => {
+      window.removeEventListener('deviceorientation', onOrient)
+      document.documentElement.classList.remove('gyro-on')
+    }
   }, [gyroOn])
 
   if (!supported) return null

@@ -215,7 +215,7 @@ void main() {
   acc.x += uWind * (6.0 + rnd.x * 14.0);
   acc.y += uWind * (rnd.y - 0.35) * 8.0;
   // Tilt the phone: the matter leans and slides with gravity, each grain by its own weight.
-  acc.xy += uGrav * (5.0 + rnd.z * 9.0);
+  acc.xy += uGrav * (22.0 + rnd.z * 40.0);
 
   // Before its turn, a particle floats as dust.
   acc += (1.0 - gate) * vec3(sin(uTime * 0.3 + rnd.x * 40.0), cos(uTime * 0.27 + rnd.y * 40.0), 0.0) * 0.12;
@@ -720,8 +720,8 @@ export default function Particles() {
     const swallow = A.target === 2 && B.target === 0
 
     g.scale.setScalar(lerp(g.scale.x, lerp(A.s, B.s, t) * base, k))
-    g.position.x += (lerp(A.x, B.x, t) * (viewport.width / 13.3) - g.position.x) * k
-    g.position.y += (lerp(A.y, B.y, t) - g.position.y) * k
+    g.position.x += (lerp(A.x, B.x, t) * (viewport.width / 13.3) + live.tilt.x * 1.1 * st.depth - g.position.x) * k
+    g.position.y += (lerp(A.y, B.y, t) - live.tilt.y * 0.7 * st.depth - g.position.y) * k
     g.rotation.z += (lerp(A.rz, B.rz, t) - g.rotation.z) * k
 
     // Cursor / gyro parallax: tiny, physical.
@@ -731,8 +731,8 @@ export default function Particles() {
     const py = live.pointer.active ? ny : 0
     const depthTarget = reduced ? 0 : live.interacted || s > 0.05 ? 1 : 0
     st.depth += (depthTarget - st.depth) * (1 - Math.exp(-dt * 0.9))
-    const tx = reduced ? 0 : (px * 0.12 + live.tilt.x * 0.38) * st.depth
-    const ty = reduced ? 0 : (-py * 0.08 - live.tilt.y * 0.26) * st.depth
+    const tx = reduced ? 0 : (px * 0.12 + live.tilt.x * 0.95) * st.depth
+    const ty = reduced ? 0 : (-py * 0.08 - live.tilt.y * 0.6) * st.depth
     st.rotY += (tx - st.rotY) * (1 - Math.exp(-dt * 3))
     st.rotX += (ty - st.rotX) * (1 - Math.exp(-dt * 3))
     g.rotation.y = st.rotY
