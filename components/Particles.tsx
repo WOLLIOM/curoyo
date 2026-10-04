@@ -8,7 +8,7 @@ import { BAMBOO_BASE, BAMBOO_SPAN, buildCore, buildFormation, CRADLE_PIVOT_Y, ty
 import { dataTexture, particleGeometry } from '@/lib/gl'
 import { MODES, live, useStore } from '@/lib/store'
 import { sound } from '@/lib/sound'
-import { tier } from '@/lib/perf'
+import { lite, tier } from '@/lib/perf'
 
 // ---------- GPU simulation: every particle is a mass on a spring, pulled toward its formation ----------
 
@@ -391,7 +391,7 @@ export default function Particles() {
   const mobile = useMemo(() => typeof window !== 'undefined' && window.innerWidth < 768, [])
   const level = useMemo(() => tier(), [])
   const weak = level === 'low'
-  const S = mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
+  const S = lite() ? 80 : mobile ? 96 : weak ? 128 : level === 'mid' ? 160 : 192
   const reduced = useMemo(
     () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []

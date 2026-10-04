@@ -3,6 +3,18 @@
 export type Tier = 'low' | 'mid' | 'high'
 
 let cached: Tier | null = null
+let liteCached: boolean | null = null
+
+// 'lite' goes one step further than 'low': very small machines, data-saver users, or ?lite in the address.
+// ?full forces the full experience (and ignores the guess), ?lite forces the lightest one.
+export function lite(): boolean {
+  if (liteCached !== null) return liteCached
+  if (typeof window === 'undefined') return false
+  const q = new URLSearchParams(window.location.search)
+  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } }
+  liteCached = q.has('full') ? false : q.has('lite') || (nav.deviceMemory ?? 8) <= 2 || (nav.hardwareConcurrency || 4) <= 2 || !!nav.connection?.saveData
+  return liteCached
+}
 
 export function tier(): Tier {
   if (cached) return cached
@@ -23,7 +35,8 @@ export function tier(): Tier {
   }
   const integrated = /Intel|HD Graphics|Iris|UHD|SwiftShader|llvmpipe|Software|Mali-[GT]?[34]/i.test(gpu)
   const discrete = /NVIDIA|GeForce|RTX|GTX|Radeon (RX|Pro)|Apple M|Apple GPU/i.test(gpu)
-  if (phone || cores <= 4 || mem <= 4 || (integrated && !discrete)) cached = 'low'
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('full')) cached = 'high'
+  else if (lite() || phone || cores <= 4 || mem <= 4 || (integrated && !discrete)) cached = 'low'
   else if (cores <= 6 && !discrete) cached = 'mid'
   else cached = 'high'
   return cached

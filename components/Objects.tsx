@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { live } from '@/lib/store'
-import { tier } from '@/lib/perf'
+import { lite, tier } from '@/lib/perf'
 
 // Small objects made of grains, floating at different depths either side of the content. Near ones are large and move
 // quickly, far ones are small and slow, so moving the mouse, scrolling or tilting a phone shows real depth.
@@ -125,7 +125,7 @@ export default function Objects() {
     let dpr = 1
     let items: Item[] = []
     const build = () => {
-      const count = phone || tier() === 'low' ? 2 : 3
+      const count = lite() ? 1 : phone || tier() === 'low' ? 2 : 3
       items = Array.from({ length: count }, (_, i) => {
         const name = NAMES[i % NAMES.length]
         // Spread the depth: a few far, a few near.

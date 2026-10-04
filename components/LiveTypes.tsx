@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { buildTextData } from '@/lib/livetype'
 import LiveMark from './LiveMark'
-import { tier } from '@/lib/perf'
+import { lite, tier } from '@/lib/perf'
 import { useStore } from '@/lib/store'
 
 // Headlines marked with data-live become live type when they come near the screen,
@@ -66,7 +66,7 @@ export default function LiveTypes() {
   return (
     <>
       {els
-        .filter((el) => armed && active.has(el))
+        .filter((el) => armed && !lite() && active.has(el))
         .map((el, i) => (
           <LiveMark key={el.dataset.live || i} anchor={el} size={size} load={buildTextData} hideAnchor />
         ))}

@@ -7,9 +7,27 @@ import Particles from './Particles'
 import Wordmark3D from './Wordmark3D'
 import SpotField from './SpotField'
 import LiveTypes from './LiveTypes'
-import { tier } from '@/lib/perf'
+import { lite, tier } from '@/lib/perf'
 
 // Development only: with ?step in the URL the scene runs on a manual clock, so it can be inspected frame by frame.
+// When even the lowest resolution can't hold a smooth frame rate, render at a steady 30 fps instead of fighting for 60.
+function Throttle() {
+  const advance = useThree((s) => s.advance)
+  useEffect(() => {
+    let raf = 0
+    let last = 0
+    const loop = (t: number) => {
+      raf = requestAnimationFrame(loop)
+      if (document.hidden || t - last < 31) return
+      last = t
+      advance(t / 1000)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [advance])
+  return null
+}
+
 function Stepper() {
   const advance = useThree((s) => s.advance)
   useEffect(() => {
@@ -35,11 +53,12 @@ export default function Scene() {
   // Adaptive quality: start sharp, and drop the resolution (never the design) if the device can't keep up.
   const [maxDpr, setMaxDpr] = useState(2)
   const [dpr, setDpr] = useState(1.5)
+  const [slow, setSlow] = useState(false)
   useEffect(() => {
     setStep(process.env.NODE_ENV !== 'production' && new URLSearchParams(window.location.search).has('step'))
     const phone = window.innerWidth < 768
     const weak = tier() === 'low'
-    const top = Math.min(window.devicePixelRatio || 1, phone ? 2 : weak ? 1.25 : 1.75)
+    const top = Math.min(window.devicePixelRatio || 1, lite() ? 1 : phone ? 2 : weak ? 1.25 : 1.75)
     setMaxDpr(top)
     // Start a notch below the ceiling; the monitor climbs back up if the device has room to spare.
     setDpr(Math.min(top, phone || weak ? 1 : 1.5))
@@ -51,16 +70,22 @@ export default function Scene() {
     <div className="fixed inset-0 z-0">
       <Canvas
         dpr={dpr}
-        frameloop={step ? 'never' : 'always'}
+        frameloop={step || slow ? 'never' : 'always'}
         gl={{ antialias: false, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: step }}
         camera={{ position: [0, 0, 8], fov: 50, near: 0.1, far: 60 }}
       >
         {!step && (
           <PerformanceMonitor
             flipflops={4}
-            onDecline={() => setDpr((d) => Math.max(0.85, +(d - 0.25).toFixed(2)))}
+            onDecline={() => {
+              if (dpr <= 0.9) setSlow(true)
+              setDpr((d) => Math.max(0.85, +(d - 0.25).toFixed(2)))
+            }}
             onIncline={() => setDpr((d) => Math.min(maxDpr, +(d + 0.25).toFixed(2)))}
-            onFallback={() => setDpr(0.85)}
+            onFallback={() => {
+              setDpr(0.85)
+              setSlow(true)
+            }}
           />
         )}
         <SpotField />
@@ -68,6 +93,7 @@ export default function Scene() {
         <Wordmark3D />
         <LiveTypes />
         {step && <Stepper />}
+        {slow && !step && <Throttle />}
       </Canvas>
     </div>
   )
