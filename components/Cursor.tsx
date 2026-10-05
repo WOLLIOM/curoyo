@@ -125,7 +125,7 @@ export default function Cursor() {
         const live = P.st !== 'away' || inSection
         const caneCol = live ? '#b8ff2a' : hot
         const caneInk = live ? '#b8ff2a' : inkCol
-        const pandaCol = '#ff4d1f'
+        const pandaCol = '#d9a26b'
         if (P.st === 'away') {
           if (inSection && cool <= 0 && pandaPts.length) {
             // Grains drift in from all around and gather into the logo beside the cane.

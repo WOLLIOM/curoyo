@@ -1,4 +1,4 @@
-# CUROYO
+# OTRYK
 
 Portfolio / studio site: Next.js 14, three.js, canvas particles.
 

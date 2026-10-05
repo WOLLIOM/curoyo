@@ -545,7 +545,7 @@ export default function Particles() {
       mu.tPortrait.value = tex.portrait
       if (err) {
         // No float render targets: show the measured snake without the simulation.
-        console.warn("CUROYO: GPU simulation unavailable, showing the static form.", err)
+        console.warn("OTRYK: GPU simulation unavailable, showing the static form.", err)
         gpu.dispose()
         mu.tPos.value = tex.snake
         built = { gpu: null, pos: null, vel: null, textures }
@@ -578,7 +578,7 @@ export default function Particles() {
           .catch((err) => {
             busy.delete(name)
             if (cancelled || tries >= 4) {
-              console.warn('CUROYO: formation failed', name, err)
+              console.warn('OTRYK: formation failed', name, err)
               return
             }
             timers.push(window.setTimeout(() => void fill(name, t, n, tries + 1), 1500 * (tries + 1)))
