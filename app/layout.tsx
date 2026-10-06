@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Bagel_Fat_One, Space_Grotesk } from 'next/font/google'
 import './globals.css'
+import { ABOUT_LANGS } from '@/components/AboutLocales'
 import { DESCRIPTION, OWNER, SITE_NAME, SITE_URL, TITLE } from '@/lib/site'
 
 const display = Bagel_Fat_One({ subsets: ['latin', 'latin-ext'], weight: '400', variable: '--font-display', display: 'swap' })
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     'BEAVIK', 'Beavik studio', 'Beavik Calgary', 'Beavik web design', 'Simon Maxam', 'Simon Maxam Calgary', 'creative technology studio', 'Calgary web design',
     '3D product configurator', 'interactive website', 'architecture visualization', 'AI assistant', 'WebGL', 'Three.js', 'Alberta',
   ],
-  alternates: { canonical: '/', languages: { 'x-default': '/', en: '/', fr: '/', es: '/', de: '/' } },
+  alternates: { canonical: '/', languages: Object.fromEntries(['x-default', 'en', ...ABOUT_LANGS].map((l) => [l, '/'])) },
   category: 'technology',
   robots: {
     index: true,
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     locale: 'en_CA',
+    alternateLocale: ['fr_CA', 'fr_FR', 'es_ES', 'de_DE', 'tr_TR', 'ru_RU', 'ar_AE', 'ja_JP', 'ko_KR', 'zh_CN', 'pt_BR', 'it_IT'],
     images: [{ url: '/logo-panda.png', width: 1254, height: 1254, alt: 'BEAVIK beaver logo' }],
   },
   twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION, images: ['/logo-panda.png'] },
