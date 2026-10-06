@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     'BEAVIK', 'Beavik studio', 'Beavik Calgary', 'Beavik web design', 'Simon Maxam', 'Simon Maxam Calgary', 'creative technology studio', 'Calgary web design',
     '3D product configurator', 'interactive website', 'architecture visualization', 'AI assistant', 'WebGL', 'Three.js', 'Alberta',
   ],
-  alternates: { canonical: '/' },
+  alternates: { canonical: '/', languages: { 'x-default': '/', en: '/', fr: '/', es: '/', de: '/' } },
   category: 'technology',
   robots: {
     index: true,
