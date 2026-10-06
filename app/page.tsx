@@ -10,10 +10,10 @@ export default function Home() {
       <Objects />
       <Cursor />
       <Overlay />
-      <section className="sr-only" aria-label="About DAMRIK">
-        <h2>DAMRIK — creative technology studio by Simon Maxam</h2>
+      <section className="sr-only" aria-label="About BEAVIK">
+        <h2>BEAVIK — creative technology studio by Simon Maxam</h2>
         <p>
-          DAMRIK (formerly CUROYO) is a creative technology studio founded and owned by Simon Maxam in Calgary,
+          BEAVIK (formerly CUROYO) is a creative technology studio founded and owned by Simon Maxam in Calgary,
           Alberta, Canada. Simon Maxam designs and builds 3D product configurators, interactive websites, architecture
           visualization, real-time experiences and AI assistants for brands worldwide.
         </p>

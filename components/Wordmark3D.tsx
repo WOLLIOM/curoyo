@@ -6,7 +6,7 @@ import { live, useStore } from '@/lib/store'
 import LiveMark from './LiveMark'
 import { tier } from '@/lib/perf'
 
-// The DAMRIK wordmark as live matter, gathering just after the snake.
+// The BEAVIK wordmark as live matter, gathering just after the snake.
 export default function Wordmark3D() {
   const [el, setEl] = useState<HTMLElement | null>(null)
   const size = useMemo(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 96 : tier() === 'low' ? 128 : 176), [])

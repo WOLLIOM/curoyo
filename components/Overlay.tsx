@@ -348,7 +348,7 @@ export default function Overlay() {
       }
     }
     window.addEventListener('keydown', onKey)
-    console.log('%cDAMRIK%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
+    console.log('%cBEAVIK%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
     return () => window.removeEventListener('keydown', onKey)
   }, [setGame])
 
@@ -450,7 +450,7 @@ export default function Overlay() {
       <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-5 py-5 sm:px-10 sm:py-7">
         <button
           onClick={() => go('intro')}
-          aria-label="DAMRIK, back to top"
+          aria-label="BEAVIK, back to top"
           className="transition-opacity duration-700"
           style={{ opacity: active === 0 ? 0 : 1, pointerEvents: active === 0 ? 'none' : 'auto' }}
         >
@@ -493,7 +493,7 @@ export default function Overlay() {
       <main>
         {/* INTRO: the wordmark is a live material; the snake does the moving. */}
         <section data-section id="intro" className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[15vh] max-sm:pb-40">
-          <h1 className="sr-only">DAMRIK, by Simon Maxam. Ideas, built in 3D.</h1>
+          <h1 className="sr-only">BEAVIK, by Simon Maxam. Ideas, built in 3D.</h1>
           {/* The image holds the wordmark's place; once the live particle wordmark is running it draws over this spot. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -682,7 +682,7 @@ export default function Overlay() {
             <Label>About</Label>
             <h2 data-react className="spotty mt-6 font-display text-[clamp(44px,7vw,104px)] leading-none tracking-[-0.01em]">Simon Maxam</h2>
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              Founder of DAMRIK. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
+              Founder of BEAVIK. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">
               {[

@@ -4,8 +4,8 @@ export const dynamic = 'force-static'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'DAMRIK',
-    short_name: 'DAMRIK',
+    name: 'BEAVIK',
+    short_name: 'BEAVIK',
     description: 'Creative technology studio by Simon Maxam, Calgary, Alberta.',
     start_url: '/',
     display: 'standalone',
