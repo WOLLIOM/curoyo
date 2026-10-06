@@ -688,9 +688,15 @@ export default function Overlay() {
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
               Founder of PALAEOX. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
-            <p className="mx-auto mt-4 max-w-[620px] text-[16px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              The name comes from Palaeocastor, an ancient beaver that lived about 25 million years ago. I shortened it to PALAEOX, so behind the name is the oldest builder there is, and the beaver is Canada's symbol.
-            </p>
+            <div className="mx-auto mt-8 max-w-[680px] rounded-[20px] px-6 py-6 text-left" style={{ boxShadow: 'inset 0 0 0 1.5px var(--line)' }}>
+              <div className="font-display text-[clamp(22px,3vw,32px)] leading-tight" style={{ color: 'var(--hot)' }}>Why PALAEOX</div>
+              <ul className="mt-4 space-y-3 text-[15px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The inspiration.</span> PALAEOX takes its name from Palaeocastor, an extinct beaver from the early days of the beaver family, some 25 to 30 million years ago, when North America was open plains.</li>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The builder.</span> Palaeocastor dug deep corkscrew burrows into the ground. Fossil spirals up to about two and a half metres deep are still found today, which is why early settlers called them "devil's corkscrews". Millions of years later, what it built is still there.</li>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The philosophy.</span> Make work that lasts. We chose the name, and the beaver as our symbol of Canada, to stand for patient, careful building: dig deep, build it right, leave something that stays standing.</li>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The name.</span> "Palaeo" means ancient. We added the X for the unknown, the next thing we build. Ancient builder, new experiences.</li>
+              </ul>
+            </div>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">
               {[
                 ['27', 'certificates'],
