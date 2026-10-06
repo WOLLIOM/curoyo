@@ -1,5 +1,5 @@
-// Set NEXT_PUBLIC_SITE_URL at deploy time (e.g. https://beavik.com once you own the domain). No trailing slash.
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://beavik.pages.dev').replace(/\/$/, '')
+// Until the beavik Pages project exists this stays on curoyo.pages.dev. Set NEXT_PUBLIC_SITE_URL at deploy time (e.g. https://beavik.com once you own the domain). No trailing slash.
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://curoyo.pages.dev').replace(/\/$/, '')
 export const SITE_NAME = 'BEAVIK'
 export const OWNER = 'Simon Maxam'
 export const TITLE = 'BEAVIK — Creative technology studio by Simon Maxam | 3D, AI, Web'
