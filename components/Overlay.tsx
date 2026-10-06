@@ -23,6 +23,7 @@ import { ConfiguratorDemo, DashboardDemo, OrderDemo, GlobeDemo, AssistantDemo } 
 
 
 // Add a real address here; until then the contact section says details are coming.
+import { PHONE, PHONE_HREF } from '@/lib/site'
 const CONTACT_EMAIL = 'simon0021maxam@gmail.com'
 
 const SECTION_IDS = ['intro', 'eden', 'newton', 'idea', 'form', 'work', 'studio', 'beyond', 'panda', 'play', 'pricing', 'about', 'credentials', 'contact']
@@ -457,7 +458,8 @@ export default function Overlay() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/wordmark.png" alt="" className="h-[18px] w-auto" style={{ filter: 'var(--logo-filter)' }} />
         </button>
-        <nav aria-label="Primary" className="ml-auto flex gap-5 text-[15px] font-bold sm:gap-9">
+        <a href="mailto:simon0021maxam@gmail.com" className="ml-auto mr-2 hidden text-[14px] font-bold underline decoration-2 underline-offset-4 xl:block" style={{ color: 'var(--hot)' }}>simon0021maxam@gmail.com</a>
+        <nav aria-label="Primary" className="flex gap-5 text-[15px] font-bold sm:gap-9">
           {NAV.map((n) => {
             const on = SECTION_IDS[active] === n.id || (n.id === 'about' && SECTION_IDS[active] === 'credentials')
             return (
@@ -674,7 +676,8 @@ export default function Overlay() {
             <Pricing />
             <p data-react className="mt-8 text-[17px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
               Every project is different. Tell us what you need and we will talk it through together, then settle the price that fits your work.{' '}
-              <a href="mailto:simon0021maxam@gmail.com" className="underline decoration-2 underline-offset-4" style={{ color: 'var(--hot)' }}>simon0021maxam@gmail.com</a>
+              <a href="mailto:simon0021maxam@gmail.com" className="underline decoration-2 underline-offset-4" style={{ color: 'var(--hot)' }}>simon0021maxam@gmail.com</a>{' · '}
+              <a href={PHONE_HREF} className="underline decoration-2 underline-offset-4" style={{ color: 'var(--hot)' }}>{PHONE}</a>
             </p>
           </div>
         </section>
