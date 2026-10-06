@@ -342,13 +342,13 @@ export default function Overlay() {
       }
       if (e.key.length !== 1) return
       buf = (buf + e.key.toLowerCase()).slice(-5)
-      if (buf === 'panda' || buf === 'otter' || buf === 'snake') {
+      if (buf === 'panda' || buf === 'beaver' || buf === 'snake') {
         buf = ''
         setGame(true)
       }
     }
     window.addEventListener('keydown', onKey)
-    console.log('%cOTRYK%c  Psst. Type "otter".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
+    console.log('%cDAMRIK%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
     return () => window.removeEventListener('keydown', onKey)
   }, [setGame])
 
@@ -450,7 +450,7 @@ export default function Overlay() {
       <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-5 py-5 sm:px-10 sm:py-7">
         <button
           onClick={() => go('intro')}
-          aria-label="OTRYK, back to top"
+          aria-label="DAMRIK, back to top"
           className="transition-opacity duration-700"
           style={{ opacity: active === 0 ? 0 : 1, pointerEvents: active === 0 ? 'none' : 'auto' }}
         >
@@ -493,7 +493,7 @@ export default function Overlay() {
       <main>
         {/* INTRO: the wordmark is a live material; the snake does the moving. */}
         <section data-section id="intro" className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[15vh] max-sm:pb-40">
-          <h1 className="sr-only">OTRYK, by Simon Maxam. Ideas, built in 3D.</h1>
+          <h1 className="sr-only">DAMRIK, by Simon Maxam. Ideas, built in 3D.</h1>
           {/* The image holds the wordmark's place; once the live particle wordmark is running it draws over this spot. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -626,13 +626,13 @@ export default function Overlay() {
           <div className="reveal w-full max-w-[min(520px,42vw)] max-lg:max-w-[620px] max-lg:text-center">
             <Label>Small, rare, curious</Label>
             <h2 data-react className="spotty mt-8 font-display text-[clamp(36px,5.4vw,78px)] leading-[1.02] tracking-[-0.01em]">
-              Meet the <span className="panda-word">sea otter.</span>
+              Meet the <span className="panda-word">beaver.</span>
             </h2>
             <p data-react className="hov mt-6 text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              It floats on its back, holds a favourite stone and anchors itself in kelp so it never drifts away. We build the same way: playful, resourceful, and always holding on to the good idea.
+              The builder of the north. It sees a river and builds a home from what it finds. We build the same way: patient, hands-on, and proudly Canadian.
             </p>
             <p className="mt-5 text-[14px] font-bold" style={{ color: 'var(--muted)' }}>
-              Its kelp grows here, frond by frond. Stir it with your cursor, or tilt your phone. Watch out: the otter nibbles the cursor.
+              Its aspen grows here, trunk by trunk. Stir it with your cursor, or tilt your phone. Watch out: the beaver gnaws the cursor.
             </p>
           </div>
         </section>
@@ -682,7 +682,7 @@ export default function Overlay() {
             <Label>About</Label>
             <h2 data-react className="spotty mt-6 font-display text-[clamp(44px,7vw,104px)] leading-none tracking-[-0.01em]">Simon Maxam</h2>
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              Founder of OTRYK. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
+              Founder of DAMRIK. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">
               {[

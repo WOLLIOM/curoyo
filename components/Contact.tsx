@@ -6,7 +6,7 @@ import { haptic } from '@/lib/phone'
 import { hashText, sound } from '@/lib/sound'
 
 const KINDS = ['A website', '3D visuals', 'A product in 3D', 'A game', 'Architecture', 'Something strange']
-const RING = 'SAY HELLO · START A PROJECT · IDEAS BUILT IN 3D · OTRYK · '
+const RING = 'SAY HELLO · START A PROJECT · IDEAS BUILT IN 3D · DAMRIK · '
 
 // Letters lean away from the cursor and blush red as it passes, like fur brushed the wrong way.
 function MagneticLine({ text, className }: { text: string; className?: string }) {
@@ -110,7 +110,7 @@ export default function Contact({ email }: { email: string }) {
   const [copied, setCopied] = useState(false)
   const [spin, setSpin] = useState(false)
 
-  const brief = `Hi OTRYK, I'd like to build ${picked.length ? picked.join(', ').toLowerCase() : 'something'}.`
+  const brief = `Hi DAMRIK, I'd like to build ${picked.length ? picked.join(', ').toLowerCase() : 'something'}.`
   const act = async () => {
     haptic([10, 30, 10])
     live.shake = 0.6
@@ -133,7 +133,7 @@ export default function Contact({ email }: { email: string }) {
       <Paws />
       <p className="inline-flex items-center gap-2.5 text-[15px] font-bold" style={{ color: 'var(--muted)' }}>
         <span aria-hidden className="inline-block h-[12px] w-[7px] -rotate-[14deg] rounded-full" style={{ background: 'var(--hot)' }} />
-        Contact · from the kelp forest to your screen
+        Contact · from the aspen grove to your screen
       </p>
       <h2 data-react className="mt-6 font-display text-[clamp(48px,9.5vw,150px)] leading-[0.92] tracking-[-0.02em]">
         <MagneticLine text="Let's build" className="block" />

@@ -17,7 +17,7 @@ type P = { x: number; y: number }
 
 function readBest() {
   try {
-    return Number(localStorage.getItem('otryk-panda-best') || 0)
+    return Number(localStorage.getItem('damrik-panda-best') || 0)
   } catch {
     return 0
   }
@@ -115,7 +115,7 @@ export function drawRing(ctx: CanvasRenderingContext2D, x: number, y: number, ce
   }
 }
 
-// The hidden game: the OTRYK sea otter eats kelp and its ringed tail grows.
+// The hidden game: the DAMRIK beaver eats leaves and its ringed tail grows.
 // A golden shoot appears now and then: worth three, but it does not wait.
 export default function PandaGame({ onClose }: { onClose: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null)
@@ -289,9 +289,9 @@ export default function PandaGame({ onClose }: { onClose: () => void }) {
       live.shake = 1
       const b = Math.max(readBest(), s.score)
       if (s.score > readBest() && s.score > 0) setMsg('New best. The grove remembers.')
-      else setMsg(s.score > 15 ? 'A long tail. Well climbed.' : 'Bonk. Otters nap after that.')
+      else setMsg(s.score > 15 ? 'A long tail. Well climbed.' : 'Bonk. Beavers nap after that.')
       try {
-        localStorage.setItem('otryk-panda-best', String(b))
+        localStorage.setItem('damrik-panda-best', String(b))
       } catch {
         // storage unavailable
       }
@@ -348,7 +348,7 @@ export default function PandaGame({ onClose }: { onClose: () => void }) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Hidden game: Sea Otter"
+      aria-label="Hidden game: Beaver"
       className="fixed inset-0 z-[80] flex items-center justify-center p-5 backdrop-blur-md"
       style={{ background: 'color-mix(in srgb, var(--bg) 94%, transparent)' }}
     >
@@ -356,7 +356,7 @@ export default function PandaGame({ onClose }: { onClose: () => void }) {
         <div className="flex items-end justify-between">
           <div>
             <p className="text-[13px] font-bold uppercase tracking-[0.14em]" style={{ color: RUST }}>Hidden game</p>
-            <p className="font-display text-[clamp(26px,5vw,38px)] leading-none">Feed the sea otter</p>
+            <p className="font-display text-[clamp(26px,5vw,38px)] leading-none">Feed the beaver</p>
           </div>
           <p className="text-right text-[15px] font-bold" style={{ color: 'var(--muted)' }}>
             <span className="font-display text-[30px] leading-none" style={{ color: 'var(--ink)' }}>{score}</span>

@@ -422,7 +422,7 @@ function buildGalaxy(count: number) {
   return out
 }
 
-// A kelp forest: five wavy stipes with round air bladders and long ribbon blades that float up and out.
+// A grove of aspen: five trunks with knots and leaves at the top (the beaver's timber).
 // pos.w = culm index + height along the grove (0..1), so the shader can grow and sway each culm.
 export const BAMBOO_BASE = -3.6
 export const BAMBOO_SPAN = 7.6
@@ -462,14 +462,14 @@ function buildBamboo(count: number) {
     const h = Math.random() * c.h
     const nearest = Math.round(h / gap) * gap
     const dn = h - nearest
-    const atNode = Math.random() < 0.12
+    const atNode = Math.random() < 0.22
     const hh = atNode ? nearest + (Math.random() - 0.5) * 0.05 : h
-    const bulge = atNode ? 2.1 : 0.8 + 0.12 * Math.exp(-(dn * dn) / 0.004)
+    const bulge = atNode ? 1.3 : 1 + 0.12 * Math.exp(-(dn * dn) / 0.004)
     const a = Math.random() * Math.PI * 2
     const r = c.r * bulge * (1 - (hh / c.h) * 0.35)
     const lean = culmLean(ci) * hh * hh * 0.12
     const y = BAMBOO_BASE + hh
-    const x = culmX(ci) + lean + Math.sin(hh * 1.4 + ci * 2) * 0.2 + Math.cos(a) * r
+    const x = culmX(ci) + lean + Math.cos(a) * r
     const z = c.z + Math.sin(a) * r
     write(ci, x, y, z, Math.cos(a), atNode ? 0.4 : 0, Math.sin(a))
   }
@@ -483,7 +483,7 @@ function buildBamboo(count: number) {
     const leafId = (Math.random() * 7) | 0
     const seed = ci * 31 + ni * 7 + leafId
     const b = seed * 2.399 + Math.sin(seed) * 0.6
-    const len = 1.3 + ((seed * 0.618) % 1) * 0.8
+    const len = 0.75 + ((seed * 0.618) % 1) * 0.45
     const u = Math.random()
     const v = (Math.random() - 0.5) * 0.2 * Math.sin(Math.PI * Math.pow(u, 0.8))
     const ox = Math.cos(b)
@@ -494,8 +494,8 @@ function buildBamboo(count: number) {
     const y0 = BAMBOO_BASE + nh + 0.15
     const z0 = c.z + oz * twig
     const x = x0 + ox * u * len - oz * v
-    const y = y0 + 0.9 * u * len * 0.8 + 0.1 * Math.sin(u * 7 + seed)
-    const z = z0 + oz * u * len + ox * v + 0.12 * Math.sin(u * 6 + seed)
+    const y = y0 + 0.18 * u - 0.55 * u * u * len
+    const z = z0 + oz * u * len + ox * v
     write(ci, x, y, z, -oz * 0.3, 1, ox * 0.3)
   }
   return f

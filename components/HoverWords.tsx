@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 
 // Small words drift up around the cursor while it moves over text, like thoughts leaving a curious animal.
-const WORDS = ['kelp', 'curious', 'climb', 'idea', '3D', 'rare', 'play', 'build', 'wave', 'float', 'shape', 'wild', 'soft', 'look up']
+const WORDS = ['timber', 'curious', 'climb', 'idea', '3D', 'rare', 'play', 'build', 'dam', 'build', 'shape', 'wild', 'soft', 'look up']
 
 export default function HoverWords() {
   const layer = useRef<HTMLDivElement>(null)
