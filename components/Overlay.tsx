@@ -23,7 +23,7 @@ import { ConfiguratorDemo, DashboardDemo, OrderDemo, GlobeDemo, AssistantDemo } 
 
 
 // Add a real address here; until then the contact section says details are coming.
-const CONTACT_EMAIL = ''
+const CONTACT_EMAIL = 'simon0021maxam@gmail.com'
 
 const SECTION_IDS = ['intro', 'eden', 'newton', 'idea', 'form', 'work', 'studio', 'beyond', 'panda', 'play', 'pricing', 'about', 'credentials', 'contact']
 // Left edge, wide screens only: my name runs down the side and fills with the theme colour as you scroll, with a glowing
@@ -348,7 +348,7 @@ export default function Overlay() {
       }
     }
     window.addEventListener('keydown', onKey)
-    console.log('%cBEAVIK%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
+    console.log('%cPALAEOX%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
     return () => window.removeEventListener('keydown', onKey)
   }, [setGame])
 
@@ -450,7 +450,7 @@ export default function Overlay() {
       <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-5 py-5 sm:px-10 sm:py-7">
         <button
           onClick={() => go('intro')}
-          aria-label="BEAVIK, back to top"
+          aria-label="PALAEOX, back to top"
           className="transition-opacity duration-700"
           style={{ opacity: active === 0 ? 0 : 1, pointerEvents: active === 0 ? 'none' : 'auto' }}
         >
@@ -493,7 +493,7 @@ export default function Overlay() {
       <main>
         {/* INTRO: the wordmark is a live material; the snake does the moving. */}
         <section data-section id="intro" className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[15vh] max-sm:pb-40">
-          <h1 className="sr-only">BEAVIK, by Simon Maxam. Ideas, built in 3D.</h1>
+          <h1 className="sr-only">PALAEOX, by Simon Maxam. Ideas, built in 3D.</h1>
           {/* The image holds the wordmark's place; once the live particle wordmark is running it draws over this spot. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -599,7 +599,7 @@ export default function Overlay() {
           <div className="reveal w-full max-w-[960px]">
             <Label>Studio</Label>
             <h2 data-react data-live="studio" className="mt-8 font-display text-[clamp(34px,6vw,86px)] leading-[1.02] tracking-[-0.01em]">
-              Spaces. Objects. Experiences.
+              We make experiences come to life.
             </h2>
             <div className="mt-12 grid gap-6 text-left sm:grid-cols-3">
               {[
@@ -624,15 +624,15 @@ export default function Overlay() {
         {/* PANDA: the new mascot. */}
         <section data-section id="panda" className="flex min-h-[85svh] items-end justify-start px-6 pb-[14vh] max-sm:pb-40 sm:items-center sm:px-10 sm:pb-0">
           <div className="reveal w-full max-w-[min(520px,42vw)] max-lg:max-w-[620px] max-lg:text-center">
-            <Label>Small, rare, curious</Label>
+            <Label>Where the name comes from</Label>
             <h2 data-react className="spotty mt-8 font-display text-[clamp(36px,5.4vw,78px)] leading-[1.02] tracking-[-0.01em]">
-              Meet the <span className="panda-word">beaver.</span>
+              Palaeox. The <span className="panda-word">ancient beaver.</span>
             </h2>
             <p data-react className="hov mt-6 text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              The builder of the north. It sees a river and builds a home from what it finds. We build the same way: patient, hands-on, and proudly Canadian.
+              Palaeocastor means "ancient beaver". Some 25 million years ago it dug giant spirals into the ground that are still there today. We took its name for the same reason: the best builders leave something that lasts. And the beaver is Canada's own.
             </p>
             <p className="mt-5 text-[14px] font-bold" style={{ color: 'var(--muted)' }}>
-              Its aspen grows here, trunk by trunk. Stir it with your cursor, or tilt your phone. Watch out: the beaver gnaws the cursor.
+              Its aspen grows here, trunk by trunk. Stir it with your cursor, or tilt your phone.
             </p>
           </div>
         </section>
@@ -672,6 +672,10 @@ export default function Overlay() {
             <Label>Pricing</Label>
             <h2 data-react data-live="pricing" className="mt-6 mb-8 font-display text-[clamp(34px,5vw,72px)] leading-[1.02] tracking-[-0.01em]">Plans that grow with you.</h2>
             <Pricing />
+            <p data-react className="mt-8 text-[17px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
+              Every project is different. Tell us what you need and we will talk it through together, then settle the price that fits your work.{' '}
+              <a href="mailto:simon0021maxam@gmail.com" className="underline decoration-2 underline-offset-4" style={{ color: 'var(--hot)' }}>simon0021maxam@gmail.com</a>
+            </p>
           </div>
         </section>
 
@@ -682,7 +686,7 @@ export default function Overlay() {
             <Label>About</Label>
             <h2 data-react className="spotty mt-6 font-display text-[clamp(44px,7vw,104px)] leading-none tracking-[-0.01em]">Simon Maxam</h2>
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              Founder of BEAVIK. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
+              Founder of PALAEOX. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">
               {[
