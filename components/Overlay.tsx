@@ -688,6 +688,9 @@ export default function Overlay() {
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
               Founder of PALAEOX. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
+            <p className="mx-auto mt-4 max-w-[620px] text-[16px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
+              The name comes from Palaeocastor, an ancient beaver that lived about 25 million years ago. I shortened it to PALAEOX, so behind the name is the oldest builder there is, and the beaver is Canada's symbol.
+            </p>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">
               {[
                 ['27', 'certificates'],
