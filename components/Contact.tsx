@@ -7,7 +7,7 @@ import { hashText, sound } from '@/lib/sound'
 import { PHONE, PHONE_HREF } from '@/lib/site'
 
 const KINDS = ['A website', '3D visuals', 'A product in 3D', 'A game', 'Architecture', 'Something strange']
-const RING = 'SAY HELLO · START A PROJECT · IDEAS BUILT IN 3D · PALAEOX · '
+const RING = 'SAY HELLO · START A PROJECT · IDEAS BUILT IN 3D · PACALIX · '
 
 // Letters lean away from the cursor and blush red as it passes, like fur brushed the wrong way.
 function MagneticLine({ text, className }: { text: string; className?: string }) {
@@ -111,7 +111,7 @@ export default function Contact({ email }: { email: string }) {
   const [copied, setCopied] = useState(false)
   const [spin, setSpin] = useState(false)
 
-  const brief = `Hi PALAEOX, I'd like to build ${picked.length ? picked.join(', ').toLowerCase() : 'something'}.`
+  const brief = `Hi PACALIX, I'd like to build ${picked.length ? picked.join(', ').toLowerCase() : 'something'}.`
   const act = async () => {
     haptic([10, 30, 10])
     live.shake = 0.6

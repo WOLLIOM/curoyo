@@ -1,4 +1,4 @@
-# PALAEOX
+# PACALIX
 
 Portfolio / studio site: Next.js 14, three.js, canvas particles.
 
@@ -17,6 +17,6 @@ npm run build && npm start
 ## Deploy (GitHub -> Cloudflare Pages)
 
 Static export (`output: 'export'`). In Cloudflare Pages: connect the GitHub repo, framework preset **Next.js (Static HTML Export)**,
-build command `npm run build`, output directory `out`, env `NODE_VERSION=20`. Result: https://palaeox.pages.dev
+build command `npm run build`, output directory `out`, env `NODE_VERSION=20`. Result: https://pacalix.pages.dev
 (set `NEXT_PUBLIC_SITE_URL` if the domain changes; SEO tags, sitemap and structured data follow it).
 After deploy: add the site in Google Search Console, submit `/sitemap.xml`, request indexing.

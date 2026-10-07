@@ -4,8 +4,8 @@ export const dynamic = 'force-static'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'PALAEOX',
-    short_name: 'PALAEOX',
+    name: 'PACALIX',
+    short_name: 'PACALIX',
     description: 'Creative technology studio by Simon Maxam, Calgary, Alberta.',
     start_url: '/',
     display: 'standalone',

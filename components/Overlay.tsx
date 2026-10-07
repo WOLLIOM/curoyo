@@ -349,7 +349,7 @@ export default function Overlay() {
       }
     }
     window.addEventListener('keydown', onKey)
-    console.log('%cPALAEOX%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
+    console.log('%cPACALIX%c  Psst. Type "beaver".', 'font-weight:700;letter-spacing:.2em', 'opacity:.6')
     return () => window.removeEventListener('keydown', onKey)
   }, [setGame])
 
@@ -451,7 +451,7 @@ export default function Overlay() {
       <header className="fixed inset-x-0 top-0 z-40 flex items-center justify-between px-5 py-5 sm:px-10 sm:py-7">
         <button
           onClick={() => go('intro')}
-          aria-label="PALAEOX, back to top"
+          aria-label="PACALIX, back to top"
           className="transition-opacity duration-700"
           style={{ opacity: active === 0 ? 0 : 1, pointerEvents: active === 0 ? 'none' : 'auto' }}
         >
@@ -495,7 +495,7 @@ export default function Overlay() {
       <main>
         {/* INTRO: the wordmark is a live material; the snake does the moving. */}
         <section data-section id="intro" className="relative flex min-h-[100svh] flex-col items-center justify-end px-6 pb-[15vh] max-sm:pb-40">
-          <h1 className="sr-only">PALAEOX, by Simon Maxam. Ideas, built in 3D.</h1>
+          <h1 className="sr-only">PACALIX, by Simon Maxam. Ideas, built in 3D.</h1>
           {/* The image holds the wordmark's place; once the live particle wordmark is running it draws over this spot. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -628,10 +628,10 @@ export default function Overlay() {
           <div className="reveal w-full max-w-[min(520px,42vw)] max-lg:max-w-[620px] max-lg:text-center">
             <Label>Where the name comes from</Label>
             <h2 data-react className="spotty mt-8 font-display text-[clamp(36px,5.4vw,78px)] leading-[1.02] tracking-[-0.01em]">
-              Palaeox. The <span className="panda-word">ancient beaver.</span>
+              Pacalix. Built like <span className="panda-word">the beaver.</span>
             </h2>
             <p data-react className="hov mt-6 text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              Palaeocastor means "ancient beaver". Some 25 million years ago it dug giant spirals into the ground that are still there today. We took its name for the same reason: the best builders leave something that lasts. And the beaver is Canada's own.
+              Pacalix is our nod to Palaeocastor, an ancient beaver that dug giant spirals into the ground some 25 million years ago. They are still there today. The best builders leave something that lasts. And the beaver is Canada's own.
             </p>
             <p className="mt-5 text-[14px] font-bold" style={{ color: 'var(--muted)' }}>
               Its aspen grows here, trunk by trunk. Stir it with your cursor, or tilt your phone.
@@ -689,15 +689,15 @@ export default function Overlay() {
             <Label>About</Label>
             <h2 data-react className="spotty mt-6 font-display text-[clamp(44px,7vw,104px)] leading-none tracking-[-0.01em]">Simon Maxam</h2>
             <p className="mx-auto mt-5 max-w-[620px] text-[18px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-              Founder of PALAEOX. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
+              Founder of PACALIX. I build interactive 3D websites, products and games, and I play guitar on stage the same way I code: patient, then suddenly fast.
             </p>
             <div className="mx-auto mt-8 max-w-[680px] rounded-[20px] px-6 py-6 text-left" style={{ boxShadow: 'inset 0 0 0 1.5px var(--line)' }}>
-              <div className="font-display text-[clamp(22px,3vw,32px)] leading-tight" style={{ color: 'var(--hot)' }}>Why PALAEOX</div>
+              <div className="font-display text-[clamp(22px,3vw,32px)] leading-tight" style={{ color: 'var(--hot)' }}>Why PACALIX</div>
               <ul className="mt-4 space-y-3 text-[15px] font-bold leading-snug" style={{ color: 'var(--muted)' }}>
-                <li><span style={{ color: 'var(--fg, #fff)' }}>The inspiration.</span> PALAEOX takes its name from Palaeocastor, an extinct beaver from the early days of the beaver family, some 25 to 30 million years ago, when North America was open plains.</li>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The inspiration.</span> PACALIX is our nod to Palaeocastor, an extinct beaver from the early days of the beaver family, some 25 to 30 million years ago, when North America was open plains.</li>
                 <li><span style={{ color: 'var(--fg, #fff)' }}>The builder.</span> Palaeocastor dug deep corkscrew burrows into the ground. Fossil spirals up to about two and a half metres deep are still found today, which is why early settlers called them "devil's corkscrews". Millions of years later, what it built is still there.</li>
                 <li><span style={{ color: 'var(--fg, #fff)' }}>The philosophy.</span> Make work that lasts. We chose the name, and the beaver as our symbol of Canada, to stand for patient, careful building: dig deep, build it right, leave something that stays standing.</li>
-                <li><span style={{ color: 'var(--fg, #fff)' }}>The name.</span> "Palaeo" means ancient. We added the X for the unknown, the next thing we build. Ancient builder, new experiences.</li>
+                <li><span style={{ color: 'var(--fg, #fff)' }}>The name.</span> PACALIX is short, easy to say and easy to remember, the same in every language. Ancient builder, new experiences.</li>
               </ul>
             </div>
             <div className="mt-10 grid grid-cols-3 gap-3 text-left">

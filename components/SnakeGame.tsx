@@ -17,7 +17,7 @@ type P = { x: number; y: number }
 
 function readBest() {
   try {
-    return Number(localStorage.getItem('palaeox-panda-best') || 0)
+    return Number(localStorage.getItem('pacalix-panda-best') || 0)
   } catch {
     return 0
   }
@@ -115,7 +115,7 @@ export function drawRing(ctx: CanvasRenderingContext2D, x: number, y: number, ce
   }
 }
 
-// The hidden game: the PALAEOX beaver eats leaves and its ringed tail grows.
+// The hidden game: the PACALIX beaver eats leaves and its ringed tail grows.
 // A golden shoot appears now and then: worth three, but it does not wait.
 export default function PandaGame({ onClose }: { onClose: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null)
@@ -291,7 +291,7 @@ export default function PandaGame({ onClose }: { onClose: () => void }) {
       if (s.score > readBest() && s.score > 0) setMsg('New best. The grove remembers.')
       else setMsg(s.score > 15 ? 'A long tail. Well climbed.' : 'Bonk. Beavers nap after that.')
       try {
-        localStorage.setItem('palaeox-panda-best', String(b))
+        localStorage.setItem('pacalix-panda-best', String(b))
       } catch {
         // storage unavailable
       }
