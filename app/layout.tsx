@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Unbounded, Space_Grotesk } from 'next/font/google'
+import { Sora, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { ABOUT_LANGS } from '@/components/AboutLocales'
 import { DESCRIPTION, OWNER, PHONE, SITE_NAME, SITE_URL, TITLE } from '@/lib/site'
 
-const display = Unbounded({ subsets: ['latin', 'latin-ext'], weight: ['700','800'], variable: '--font-display', display: 'swap' })
+const display = Sora({ subsets: ['latin', 'latin-ext'], weight: ['700', '800'], variable: '--font-display', display: 'swap' })
 const sans = Space_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-sans', display: 'swap' })
 
 export const metadata: Metadata = {
